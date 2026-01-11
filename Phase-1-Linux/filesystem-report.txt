@@ -1,0 +1,143 @@
+=== FILESYSTEM EXPLORATION REPORT ===
+Date: January 6, 2026
+Student: Sam
+
+================================================================================
+
+a) TOP 5 LARGEST DIRECTORIES IN /var
+   
+   Command:
+   sudo du -sh /var/* | sort -hr | head -5
+   
+   Output:
+    1.9G    /var/lib
+    168M    /var/cache
+    68M     /var/log
+    5.0M    /var/snap
+    1.7M    /var/backups
+   
+   Notes: Uses du (disk usage), sort (human-readable reverse), head (top 5)
+
+================================================================================
+
+b) ALL FILES IN /etc CONTAINING "ssh" IN THEIR NAME
+   
+   Command (Corrected):
+   sudo find /etc -type f -name "*ssh*"
+   
+   Output:
+   /etc/ssh/ssh_host_rsa_key.pub
+   /etc/ssh/ssh_host_ecdsa_key
+   /etc/ssh/ssh_config
+   /etc/ssh/ssh_host_ecdsa_key.pub
+   /etc/ssh/ssh_host_rsa_key
+   /etc/ssh/ssh_host_ed25519_key
+   /etc/ssh/ssh_host_ed25519_key.pub
+   /etc/X11/Xsession.d/90x11-common_ssh-agent
+   /etc/xdg/autostart/gnome-keyring-ssh.desktop
+   
+   Notes: Used -type f to only find files (not directories). Pattern must be quoted.
+
+================================================================================
+
+c) IDENTIFY FILE TYPE OF /bin/bash
+   
+   Command:
+   file /bin/bash
+   
+   Output:
+   /bin/bash: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), 
+   dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, 
+   BuildID[sha1]=2f77b36371c214e11670c7d9d92727e9a49f626b, 
+   for GNU/Linux 3.2.0, stripped
+   
+   Notes: This is a compiled binary (ELF executable), not a shell script.
+
+================================================================================
+
+d) CREATE SYMLINK "logs" IN HOME DIRECTORY POINTING TO /var/log
+   
+   Command (Corrected):
+   ln -s /var/log ~/logs
+   
+   Verification:
+   ls -l ~/logs
+   
+   Expected Output:
+   logs -> /var/log
+   
+   Notes: Must specify full path for symlink location (~/logs).
+   The symlink allows accessing /var/log contents from ~/logs
+
+================================================================================
+
+e) LIST ALL HIDDEN FILES IN HOME DIRECTORY
+   
+   Command (Corrected):
+   ls -a ~
+   
+   Alternative (hidden files only):
+   ls -la ~ | grep "^\."
+   
+   Or using find:
+   find ~ -maxdepth 1 -name ".*" -type f
+   
+   Sample Output:
+   .bash_history
+   .bash_logout
+   .bashrc
+   .profile
+   .ssh
+   .cache
+   .config
+   
+   Notes: Hidden files start with a dot (.). The ~ refers to home directory.
+
+================================================================================
+
+f) FULL PATH OF python3 COMMAND
+   
+   Command:
+   which python3
+   
+   Output:
+   /usr/bin/python3
+   
+   Additional info (using whereis):
+   whereis python3
+   python3: /usr/bin/python3 /usr/lib/python3 /etc/python3 
+            /usr/share/python3 /usr/share/man/man1/python3.1.gz
+   
+   Notes: 'which' shows executable path, 'whereis' shows additional locations.
+
+================================================================================
+
+g) TOTAL NUMBER OF FILES IN /usr/bin/
+   
+   Command:
+   ls -a /usr/bin/ | wc -l
+   
+   Output:
+   1402
+   
+   Notes: This includes . and .., so actual files = 1402 - 2 = 1400 files.
+   Could also use: find /usr/bin -type f | wc -l (more accurate)
+
+================================================================================
+
+COMMANDS SUMMARY:
+1. sudo du -sh /var/* | sort -hr | head -5
+2. sudo find /etc -type f -name "*ssh*"
+3. file /bin/bash
+4. ln -s /var/log ~/logs
+5. ls -a ~
+6. which python3
+7. ls -a /usr/bin/ | wc -l
+
+================================================================================
+
+
+
+
+
+

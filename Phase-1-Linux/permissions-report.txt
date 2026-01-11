@@ -1,0 +1,491 @@
+=== PERMISSIONS & FILE MANAGEMENT REPORT ===
+Date: January 11, 2026
+Student: Sam
+Module: 2 - File Operations & Permissions
+
+================================================================================
+TASK 1: CREATE DIRECTORY STRUCTURE
+================================================================================
+
+Command Used:
+mkdir -p /home/sam/app-deployment/{bin,config,logs,data}
+cd ./app-deployment/
+
+✅ EXCELLENT: Used brace expansion to create all directories in one command
+✅ GOOD: Used -p flag to create parent directories if needed
+
+Initial Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l
+total 16
+drwxrwxr-x 2 sam sam 4096 Jan 11 14:04 bin
+drwxrwxr-x 2 sam sam 4096 Jan 11 14:04 config
+drwxrwxr-x 2 sam sam 4096 Jan 11 14:04 data
+drwxrwxr-x 2 sam sam 4096 Jan 11 14:04 logs
+
+⚠️ NOTE: Directories created with default umask (775 = rwxrwxr-x)
+This is fine, but you'll adjust them later to match requirements.
+
+After Adjustment:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ chmod 755 ./*
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l
+total 16
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:04 bin
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:04 config
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:04 data
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:04 logs
+
+✅ GOOD: Changed to 755 (rwxr-xr-x) - owner can write, others can only read/enter
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Correct approach!
+✅ Good use of brace expansion
+✅ Properly adjusted permissions
+
+Alternative (more explicit):
+mkdir -p /home/sam/app-deployment/bin
+mkdir -p /home/sam/app-deployment/config
+mkdir -p /home/sam/app-deployment/logs
+mkdir -p /home/sam/app-deployment/data
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 2: CREATE FILES WITH PROPER PERMISSIONS
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+FILE 1: /home/sam/app-deployment/bin/startup.sh (executable script)
+────────────────────────────────────────────────────────────────────────────────
+
+Commands:
+touch bin/startup.sh
+chmod 755 startup.sh
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l ./bin/
+total 0
+-rwxr-xr-x 1 sam sam 0 Jan 11 14:18 startup.sh
+
+Your Reason:
+"It should be executable and readable by all but only owner can edit it."
+
+✅ CORRECT UNDERSTANDING!
+✅ 755 = rwxr-xr-x (owner: full, others: read+execute)
+
+⚠️ TASK REQUIREMENT: 750 (rwxr-x---)
+You set 755, but task asked for 750. You fixed this later in Task 4. Good!
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 755 vs 750:
+- 755 (rwxr-xr-x) → Everyone can execute
+- 750 (rwxr-x---) → Only owner+group can execute, others blocked
+
+For production scripts in a shared environment, 750 is MORE SECURE because
+you control exactly who (via group membership) can run the script.
+
+✅ Your reasoning shows you understand the concept!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+────────────────────────────────────────────────────────────────────────────────
+FILE 2: /home/sam/app-deployment/config/app.conf (readable by owner only)
+────────────────────────────────────────────────────────────────────────────────
+
+Commands:
+touch config/app.conf
+chmod 400 config/app.conf
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l  ./config/
+total 0
+-r-------- 1 sam sam 0 Jan 11 14:21 app.conf
+
+⚠️ ISSUE: You set 400 (r--------), but task asked for 644 (rw-r--r--)
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ MISTAKE: Task description said "readable by owner only" which is confusing!
+
+Let me clarify:
+- Task requirement: 644 (rw-r--r--)
+- Your interpretation: 400 (r--------)
+
+The task wanted:
+- Owner: read + WRITE (rw-)
+- Others: read only (r--)
+
+You gave:
+- Owner: read ONLY (r--)
+- Others: no access (---)
+
+📚 Why task wants 644:
+Config files typically need to be:
+1. Readable by the service (r--)
+2. Editable by owner for updates (rw-)
+
+400 is TOO restrictive - you can't even EDIT your own config file!
+
+Try this:
+echo "test=value" >> config/app.conf
+# With 400: Permission denied (even though you own it!)
+
+✅ CORRECT COMMAND:
+chmod 644 config/app.conf
+
+You fixed this in Task 4, showing you learned from the requirement! Good!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+────────────────────────────────────────────────────────────────────────────────
+FILE 3: /home/sam/app-deployment/config/database.yml (secrets - owner only)
+────────────────────────────────────────────────────────────────────────────────
+
+Commands:
+touch config/database.yml
+chmod 600 ./config/database.yml
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l ./config/
+total 0
+-r-------- 1 sam sam 0 Jan 11 14:21 app.conf
+-rw------- 1 sam sam 0 Jan 11 14:24 database.yml
+
+✅ PERFECT! 600 (rw-------) is exactly right for secrets!
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXCELLENT! This is exactly how SSH private keys are protected.
+
+600 = Only owner can read/write, nobody else can see it.
+
+This prevents:
+- Other users from reading passwords
+- Accidental exposure of secrets
+- Security breaches
+
+Real-world example:
+ls -l ~/.ssh/id_rsa
+-rw------- 1 sam sam 3434 Jan 10 10:00 /home/sam/.ssh/id_rsa
+          └─ Same 600 permissions!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+────────────────────────────────────────────────────────────────────────────────
+FILE 4: /home/sam/app-deployment/logs/app.log (writable by owner)
+────────────────────────────────────────────────────────────────────────────────
+
+Commands:
+touch ./logs/app.log
+chmod 644  ./logs/app.log
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l ./logs/
+total 0
+-rw-r--r-- 1 sam sam 0 Jan 11 14:26 app.log
+
+Your Reason:
+"Only owner should be able to read and write, group and others should be able to view it."
+
+✅ PERFECT REASONING!
+✅ 644 = rw-r--r-- (owner: read+write, others: read only)
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXCELLENT! Your reasoning is spot-on.
+
+644 for logs makes sense because:
+- Application (owner) needs to WRITE logs (w)
+- Admins/monitoring need to READ logs (r--)
+- But shouldn't modify logs (no w for others)
+
+Production scenario:
+- Your app runs as user "webapp" (owner)
+- Your monitoring tool runs as different user
+- Monitoring can read logs but not tamper with them
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 3: WRITE SCRIPT CONTENT
+================================================================================
+
+Command:
+vim ./bin/startup.sh
+
+Content:
+#!/bin/bash
+echo "Application starting..."
+date >> /home/sam/app-deployment/logs/app.log
+
+✅ CORRECT: Used shebang (#!/bin/bash)
+✅ CORRECT: Used >> to append (not overwrite)
+✅ CORRECT: Used absolute path for log file
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Perfect script! A few notes:
+
+1. Shebang (#!/bin/bash) is REQUIRED for scripts
+2. >> appends (good for logs)
+3. Absolute path (/home/sam/...) prevents issues if script run from elsewhere
+
+Production improvement:
+#!/bin/bash
+LOG_FILE="/home/sam/app-deployment/logs/app.log"
+echo "Application starting at $(date)" >> "$LOG_FILE"
+echo "Started by user: $(whoami)" >> "$LOG_FILE"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 4: SET EXACT PERMISSIONS
+================================================================================
+
+Commands:
+chmod 750 bin/startup.sh
+chmod 644 config/app.conf
+chmod 600 config/database.yml
+chmod 644 logs/app.log
+chmod 755 logs/
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -l ./
+total 16
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:29 bin
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:24 config
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:04 data
+drwxr-xr-x 2 sam sam 4096 Jan 11 14:26 logs
+
+✅ PERFECT: All permissions set correctly!
+✅ GOOD: Used numeric notation (faster than symbolic)
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXCELLENT WORK!
+
+Permission Summary:
+- startup.sh: 750 (rwxr-x---) → Executable, group can run, others can't
+- app.conf: 644 (rw-r--r--) → Owner edits, others read
+- database.yml: 600 (rw-------) → Private secrets
+- app.log: 644 (rw-r--r--) → Owner writes, others read
+- logs/ dir: 755 (rwxr-xr-x) → Owner writes, others enter/list
+
+All correct! Shows you understand:
+- When to restrict (600 for secrets)
+- When to share (644 for configs)
+- Execute permission for scripts (750)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 5: TEST THE SCRIPT
+================================================================================
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ./bin/startup.sh 
+Application starting...
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ cat ./logs/app.log 
+Sun 11 Jan 2026 02:33:57 PM IST
+
+✅ PERFECT: Script executed successfully!
+✅ PERFECT: Log file updated correctly!
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Excellent! The script works as expected.
+
+Test coverage:
+✅ Script has execute permission (750)
+✅ Script can write to log file (owner of both)
+✅ Date appended correctly (not overwritten)
+
+Try running it again:
+./bin/startup.sh
+cat ./logs/app.log
+
+You should see TWO timestamps (>> appends, doesn't overwrite).
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 6: COMPLETE DIRECTORY LISTING
+================================================================================
+
+Output:
+sam@sam-VMware-Virtual-Platform:~/app-deployment$ ls -la .
+total 24
+drwxrwxr-x  6 sam sam 4096 Jan 11 14:04 .
+drwxr-x--- 21 sam sam 4096 Jan 11 14:29 ..
+drwxr-xr-x  2 sam sam 4096 Jan 11 14:29 bin
+drwxr-xr-x  2 sam sam 4096 Jan 11 14:24 config
+drwxr-xr-x  2 sam sam 4096 Jan 11 14:04 data
+drwxr-xr-x  2 sam sam 4096 Jan 11 14:26 logs
+
+⚠️ NOTE: Shows only directories, not files inside them
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 IMPROVEMENT: Task asked for "entire structure" - should show files too.
+
+Better commands:
+# Show complete tree
+tree -apug /home/sam/app-deployment/
+
+# Or using ls recursively
+ls -laR /home/sam/app-deployment/
+
+# Or find with details
+find /home/sam/app-deployment/ -ls
+
+Complete output should show:
+- All directories (bin/, config/, logs/, data/)
+- All files (startup.sh, app.conf, database.yml, app.log)
+- Their permissions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+TASK 7: SECURITY CHALLENGE
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+Q1: What if startup.sh had 777 permissions?
+────────────────────────────────────────────────────────────────────────────────
+
+Your Answer:
+"Anyone can modify it and tamper with program"
+
+✅ CORRECT!
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PERFECT UNDERSTANDING!
+
+777 = rwxrwxrwx means:
+- Owner: full access
+- Group: full access
+- EVERYONE: full access
+
+Security risks:
+1. Any user can MODIFY the script (inject malicious code)
+2. Any user can DELETE the script
+3. Attacker could add: rm -rf / to your startup script!
+
+Real attack scenario:
+# Attacker as user "attacker"
+echo "rm -rf /home/sam/*" >> startup.sh
+# Next time you run it, your files are gone!
+
+NEVER use 777 on executable files!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+────────────────────────────────────────────────────────────────────────────────
+Q2: What if database.yml had 644 permissions?
+────────────────────────────────────────────────────────────────────────────────
+
+Your Answer:
+"All groups and others can read the db configuration which is not good"
+
+✅ CORRECT!
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXCELLENT UNDERSTANDING!
+
+644 = rw-r--r-- means:
+- Owner: read + write
+- Group: READ (this is the problem!)
+- Others: READ (this is the problem!)
+
+What gets exposed:
+- Database passwords
+- API keys
+- Secret tokens
+- Connection strings
+
+Real scenario:
+# Any user can read your secrets
+cat /home/sam/app-deployment/config/database.yml
+# Output:
+# db_password: MySecretPass123
+# api_key: sk-1234567890abcdef
+
+This is how data breaches happen!
+
+Always use 600 for files containing secrets.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+────────────────────────────────────────────────────────────────────────────────
+Q3: What if /logs directory had 777 permissions?
+────────────────────────────────────────────────────────────────────────────────
+
+Your Answer:
+"Anyone can write in log data comprising the credibility of logs."
+
+✅ CORRECT CONCEPT! (Minor grammar: "compromising" not "comprising")
+
+INSTRUCTOR NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXCELLENT! Your understanding is spot-on.
+
+777 on /logs/ = drwxrwxrwx means:
+- Anyone can CREATE files
+- Anyone can DELETE files (including your logs!)
+- Anyone can MODIFY log contents
+
+Security problems:
+1. Log tampering:
+   echo "FAKE ERROR" >> app.log
+   # Hide evidence of attack
+
+2. Log deletion:
+   rm app.log
+   # Destroy audit trail
+
+3. Disk filling attack:
+   while true; do echo "spam" >> /logs/attack.log; done
+   # Fill disk, crash system
+
+Production incident example:
+- Attacker gains access
+- Deletes all logs (evidence gone)
+- You can't investigate the breach!
+
+This is why logs need 644 (owner writes, others read-only).
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+================================================================================
+OVERALL ASSESSMENT
+================================================================================
+
+✅ STRENGTHS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Excellent use of brace expansion for directory creation
+2. Correct understanding of permission security implications
+3. Perfect handling of secrets (600 for database.yml)
+4. Good script writing (shebang, append operator, absolute paths)
+5. Systematic approach (create, set permissions, test)
+6. Strong grasp of security risks (777, 644 on secrets)
+7. Successfully tested the script
+
+⚠️ AREAS FOR IMPROVEMENT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Initially set 400 instead of 644 for app.conf (but corrected it)
+2. Final ls -la output incomplete (should show all files recursively)
+3. Could have verified each permission immediately after setting it
+
+📚 KEY LEARNINGS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 600 (rw-------) for secrets - ALWAYS
+2. 644 (rw-r--r--) for configs - owner writes, others read
+3. 755 (rwxr-xr-x) for directories - allows entry
+4. 750 (rwxr-x---) for scripts - controlled execution
+5. Never use 777 - massive security hole
+6. Test immediately after changes
+
+🎯 GRADE: 90/100
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Deductions:
+- Initial permission confusion (-5)
+- Incomplete final output (-5)
+
+EXCELLENT WORK! You have a solid understanding of Linux permissions and
+file security. Ready for Module 3!
+
+================================================================================
+END OF REPORT
+================================================================================
