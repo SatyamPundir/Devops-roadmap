@@ -1,0 +1,88 @@
+========================== Process management Report =================================================
+Date: January 23, 2026
+Student: Sam
+Module: 3 - Process management
+
+================================================================================
+TASK 1: Start Multiple bg process
+================================================================================
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ ~/cpu-hog.sh &
+[1] 12258
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ ~/cpu-hog.sh &
+[2] 12279
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ nice -n 10 ~/cpu-hog.sh &
+[3] 12542
+
+================================================================================
+TASK 2: Monitor and Document
+================================================================================
+1. Find all 3 processes
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ ps aux | grep hog
+sam        12258 98.7  0.0   7392  3424 pts/1    R    13:27   3:37 /bin/bash /home/sam/cpu-hog.sh
+sam        12279 98.9  0.0   7392  3420 pts/1    R    13:27   3:32 /bin/bash /home/sam/cpu-hog.sh
+sam        12542 95.6  0.0   7392  3424 pts/1    RN   13:28   2:26 /bin/bash /home/sam/cpu-hog.sh
+sam        12848  0.0  0.0   6628  2276 pts/1    S+   13:31   0:00 grep --color=auto hog
+
+2. Watch there CPU usage
+top - 13:35:24 up  1:56,  1 user,  load average: 3.84, 2.98, 1.52
+Tasks: 345 total,   4 running, 341 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 31.6 us, 43.9 sy,  8.1 ni, 16.5 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+MiB Mem :   5877.6 total,    228.4 free,   2712.1 used,   3385.1 buff/cache     
+MiB Swap:   4096.0 total,   4095.7 free,      0.3 used.   3165.6 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                                                   
+  12279 sam       20   0    7392   3420   3096 R  94.1   0.1   7:23.98 cpu-hog.sh                                                                                                                                                
+  12258 sam       20   0    7392   3424   3096 R  91.1   0.1   7:29.51 cpu-hog.sh                                                                                                                                                
+  12542 sam       30  10    7392   3424   3096 R  79.5   0.1   6:11.23 cpu-hog.sh   
+
+  I pressed `o` then typed COMMAND=cpu-hog.sh, to filter out the my program.
+
+3. Find there PID by there name:
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ pgrep cpu-hog.sh
+12258
+12279
+12542
+4. Note which one have the lowest CPU usage
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                                                   
+  12279 sam       20   0    7392   3420   3096 R  94.1   0.1   7:23.98 cpu-hog.sh                                                                                                                                                
+  12258 sam       20   0    7392   3424   3096 R  91.1   0.1   7:29.51 cpu-hog.sh                                                                                                                                                
+  12542 sam       30  10    7392   3424   3096 R  79.5   0.1   6:11.23 cpu-hog.sh   
+answer is PID 12542 uses only 79.5%, and is nicest among all three.
+
+================================================================================
+TASK 3: Process Control
+================================================================================
+1. Suspend one process
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ kill -19 12279
+
+[2]+  Stopped                 ~/cpu-hog.sh
+
+2.Resume it in background
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ jobs
+[2]+  Stopped                 ~/cpu-hog.sh
+[4]-  Running                 nice -n 10 ~/cpu-hog.sh &
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ bg %2
+[2]+ ~/cpu-hog.sh &
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+3. Renice one of the process
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ renice -n 19 -p 12279
+12279 (process ID) old priority 0, new priority 19
+4. Kill all
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ killall cpu-hog.sh
+[2]-  Terminated              ~/cpu-hog.sh
+[4]+  Terminated              nice -n 10 ~/cpu-hog.sh
+
+
+================================================================================
+TASK 4: Security Challenge
+================================================================================
+1. What happenps if you kill -9 1 (init process)
+Ans: Whole system may crash.
+
+2. Why Do zombie processes exist?
+Ans: When invoker of the process abandons them or dies wihout taking care of the child processes the process becomes zombie. They keep on working as no one is stoping them or terminating.
+
+3. When should you use SIGTERM vs SIGKILL
+ANs: SIGTERM: Should be sufficient in most of the cases because it ensure gracefull termination and avoids zombies.
+     SIGKILL: Should be only used if SIGTERM is used and process refuses, or the process is frozen.
