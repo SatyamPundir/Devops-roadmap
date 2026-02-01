@@ -5,7 +5,7 @@
 ## 📋 Learning Phases
 
 ### ✅ Completed Phases
-*None yet*
+*None yet — Phase 1 in progress*
 
 ### 🔄 Current Phase
 **Phase 1: Linux Fundamentals (DevOps-grade)**
@@ -25,20 +25,62 @@
 
 ---
 
-## 🎯 Current Progress
+## 🎯 Phase 1 Progress
 
-**Phase**: 1 - Linux Fundamentals  
-**Task**: Pending  
-**Status**: Starting
+| # | Module | Score | Status |
+|---|--------|-------|--------|
+| 1 | Filesystem & Navigation | 90% | ✅ Complete |
+| 2 | File Operations & Permissions | 90% | ✅ Complete |
+| 3 | Process Management | 92% | ✅ Complete |
+| 4 | System Services (systemd) | 91% | ✅ Complete |
+| 5 | Users, Groups & sudo | 82% | ✅ Complete |
+| 6 | Package Management | — | 📖 Reading |
+| 7 | Text Processing | — | 🔜 Upcoming |
+| 8 | Monitoring & Logs | — | 🔜 Upcoming |
+| 9 | Networking Basics | — | 🔜 Upcoming |
+| 10 | Disk & Storage | — | 🔜 Upcoming |
+
+**Average Score (Modules 1-5):** 89%
+
+---
+
+## 📁 Repository Structure
+
+```
+DevopsRoadmap/
+├── README.md
+└── Phase-1-Linux/
+    ├── README.md
+    ├── 01-filesystem-navigation.md      ✅
+    ├── 02-file-operations-permissions.md ✅
+    ├── 03-process-management.md         ✅
+    ├── 04-systemd-services.md           ✅
+    ├── 05-users-groups-sudo.md          ✅
+    ├── 06-package-management.md         📖
+    ├── filesystem-report.txt            ✅
+    ├── permissions-report.txt           ✅
+    ├── process-management-report.txt    ✅
+    ├── systemd-report.txt               ✅
+    └── users-report.txt                 ✅
+```
 
 ---
 
 ## ⚙️ Environment Specs
-- **VM**: Linux
+- **VM**: Ubuntu Linux (VMware)
 - **RAM**: 6 GB
 - **CPU**: 4 cores
 - **Disk**: 100 GB
 
 ---
 
-**Last Updated**: January 4, 2026
+## 📝 Learning Methodology
+- Comprehensive knowledge base for each module
+- Real-world production scenarios & examples
+- Mini-task after each module
+- Graded review with corrections
+- Learning log documenting doubts & solutions
+
+---
+
+**Last Updated**: February 1, 2026
