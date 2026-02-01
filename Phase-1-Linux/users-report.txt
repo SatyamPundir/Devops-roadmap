@@ -1,0 +1,239 @@
+========================== User Groups Sudo Report =================================================
+Date: February 1, 2026
+Student: Sam
+Module: 5 - User Group Sudo Report
+
+
+================================================================================
+Part 1: Create Team Structure
+================================================================================
+
+```bash
+# Create groups
+sudo groupadd webdev
+sudo groupadd dbadmin
+sudo groupadd deployers
+O/P:
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /etc/group | grep -E 'webdev|dbadmin|deployer'
+webdev:x:1003:
+dbadmin:x:1004:
+deployers:x:1005:
+
+# Create shared directory
+sudo mkdir -p /opt/webapp
+```
+O/p: 
+
+
+================================================================================
+Part 2: Create Users
+================================================================================
+
+Create these users with proper settings:
+
+| Username | Full Name | Groups | Shell | Notes |
+|----------|-----------|--------|-------|-------|
+| `alice` | Alice Developer | webdev, deployers | bash | Developer |
+| `bob` | Bob Backend | webdev | bash | Developer (no deploy) |
+| `carol` | Carol DBA | dbadmin | bash | Database admin |
+| `appuser` | - | - | nologin | Service account |
+
+O/P:
+
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo useradd -m -d /home/alice -s /bin/bash -G webdev,deployers -c "Developer" alice
+sam@sam-VMware-Virtual-Platform:~/webapp$ groups alice
+alice : alice webdev deployers
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo useradd -m -d /home/bob -s /bin/bash -G webdev -c "Bob Backend, Developer (no deploy)" bob
+sam@sam-VMware-Virtual-Platform:~/webapp$ groups bob
+bob : bob webdev
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo useradd -m -d /home/carol -s /bin/bash -G dbadmin -c "Carol DBA, Database Admin" carol
+sam@sam-VMware-Virtual-Platform:~/webapp$ groups carol
+carol : carol dbadmin
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo useradd -r -s /usr/sbin/nologin -c "Service Account" appuser
+sam@sam-VMware-Virtual-Platform:~/webapp$ groups appuser
+appuser : appuser
+
+================================================================================
+Part 3: Configure sudo Access
+================================================================================
+
+Create `/etc/sudoers.d/webapp-team` with:
+
+1. **webdev group** can:
+- Restart/reload/status `myapp.service` (from Module 4)
+
+2. **deployers group** can:
+- All webdev permissions
+- Write to `/opt/webapp/` (via proper group ownership, not sudo)
+
+3. **dbadmin group** can:
+- Run `psql` and `pg_dump` as postgres user
+
+o/p:
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo visudo -f /etc/sudoers.d/webapp-team
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo cat /etc/sudoers.d/webapp-team
+#Define Command groups
+Cmnd_Alias WEB_CMDS = /usr/bin/systemctl reload  myapp.servie, \
+                     /usr/bin/systemctl restart myapp.service, \
+                     /usr/bin/systemctl status myapp.service
+Cmnd_Alias DEPLOY_CMDS = \
+    /usr/bin/systemctl start myapp.service, \
+    /usr/bin/systemctl stop myapp.service
+
+Cmndd_Alias DB_CMDS = \
+        /usr/bin/psql, \
+        /usr/bin/ps_dump
+
+%webdev ALL=(root) NOPASSWD: WEB_CMDS
+%deployers ALL=(root) NOPASSWD: WEB_CMDS, DEPLOY_CMDS
+%dbadmin ALl=(postgres) NOPASSWD: DB_CMDS
+
+sam@sam-VMware-Virtual-Platform:/opt$ ls -la
+total 16
+drwxr-xr-x  4 root root 4096 Feb  1 14:32 .
+drwxr-xr-x 23 root root 4096 Jan  6 21:43 ..
+drwxr-xr-x  3 root root 4096 Jan  4 13:08 google
+drwxr-xr-x  2 root root 4096 Feb  1 14:32 webapp
+sam@sam-VMware-Virtual-Platform:/opt$ sudo chown -R root:deployers /opt/webapp/
+sam@sam-VMware-Virtual-Platform:/opt$ ls -la
+total 16
+drwxr-xr-x  4 root root      4096 Feb  1 14:32 .
+drwxr-xr-x 23 root root      4096 Jan  6 21:43 ..
+drwxr-xr-x  3 root root      4096 Jan  4 13:08 google
+drwxr-xr-x  2 root deployers 4096 Feb  1 14:32 webapp
+sam@sam-VMware-Virtual-Platform:/opt$ sudo chmod -R 2775 /opt/webapp/
+sam@sam-VMware-Virtual-Platform:/opt$ ls -la
+total 16
+drwxr-xr-x  4 root root      4096 Feb  1 14:32 .
+drwxr-xr-x 23 root root      4096 Jan  6 21:43 ..
+drwxr-xr-x  3 root root      4096 Jan  4 13:08 google
+drwxrwsr-x  2 root deployers 4096 Feb  1 14:32 webapp
+sam@sam-VMware-Virtual-Platform:/opt$ 
+
+================================================================================
+Part 4: Test and Verify
+================================================================================
+
+1. Login as each user and test permissions
+
+alice@sam-VMware-Virtual-Platform:~$ id alice
+uid=1003(alice) gid=1006(alice) groups=1006(alice),1003(webdev),1005(deployers)
+alice@sam-VMware-Virtual-Platform:~$ sudo -l
+Matching Defaults entries for alice on sam-VMware-Virtual-Platform:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User alice may run the following commands on sam-VMware-Virtual-Platform:
+    (root) NOPASSWD: /usr/bin/systemctl reload myapp.servie, /usr/bin/systemctl restart myapp.service, /usr/bin/systemctl status myapp.service
+    (root) NOPASSWD: /usr/bin/systemctl reload myapp.servie, /usr/bin/systemctl restart myapp.service, /usr/bin/systemctl status myapp.service, /usr/bin/systemctl start myapp.service, /usr/bin/systemctl stop myapp.service
+alice@sam-VMware-Virtual-Platform:~$ su - bob
+Password: 
+bob@sam-VMware-Virtual-Platform:~$ id alice
+uid=1003(alice) gid=1006(alice) groups=1006(alice),1003(webdev),1005(deployers)
+bob@sam-VMware-Virtual-Platform:~$ sudo -l
+Matching Defaults entries for bob on sam-VMware-Virtual-Platform:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User bob may run the following commands on sam-VMware-Virtual-Platform:
+    (root) NOPASSWD: /usr/bin/systemctl reload myapp.servie, /usr/bin/systemctl restart myapp.service, /usr/bin/systemctl status myapp.service
+bob@sam-VMware-Virtual-Platform:~$ su - carol
+Password: 
+carol@sam-VMware-Virtual-Platform:~$ id
+uid=1005(carol) gid=1008(carol) groups=1008(carol),1004(dbadmin)
+carol@sam-VMware-Virtual-Platform:~$ sudo -l
+[sudo] password for carol: 
+Sorry, user carol may not run sudo on sam-VMware-Virtual-Platform.
+
+2. Verify alice CAN restart myapp
+carol@sam-VMware-Virtual-Platform:~$ su - alice
+Password: 
+alice@sam-VMware-Virtual-Platform:~$ systemctl start myapp
+alice@sam-VMware-Virtual-Platform:~$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+    Drop-In: /etc/systemd/system/myapp.service.d
+             └─override.conf
+     Active: active (running) since Sun 2026-02-01 16:43:30 IST; 10s ago
+   Main PID: 23500 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.8M (peak: 3.9M)
+        CPU: 17ms
+     CGroup: /system.slice/myapp.service
+             └─23500 /home/sam/webapp/venv/bin/python app.py
+alice@sam-VMware-Virtual-Platform:~$ systemctl restart myapp
+alice@sam-VMware-Virtual-Platform:~$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+    Drop-In: /etc/systemd/system/myapp.service.d
+             └─override.conf
+     Active: active (running) since Sun 2026-02-01 16:44:00 IST; 11s ago
+   Main PID: 23739 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 3.9M)
+        CPU: 14ms
+     CGroup: /system.slice/myapp.service
+             └─23739 /home/sam/webapp/venv/bin/python app.py
+alice@sam-VMware-Virtual-Platform:~$ 
+
+3. Verify bob CANNOT deploy to /opt/webapp
+
+bob@sam-VMware-Virtual-Platform:~$ touch /opt/webapp/test.txt
+touch: cannot touch '/opt/webapp/test.txt': Permission denied
+
+4. Verify carol CAN run psql as postgres
+my postgres setup is not there
+carol@sam-VMware-Virtual-Platform:~$ sudo -l
+[sudo] password for carol: 
+Sorry, user carol may not run sudo on sam-VMware-Virtual-Platform.
+carol@sam-VMware-Virtual-Platform:~$ 
+
+5. Verify appuser CANNOT login
+carol@sam-VMware-Virtual-Platform:~$ su - appuser
+Password: 
+su: warning: cannot change directory to /home/appuser: No such file or directory
+This account is currently not available.
+
+================================================================================
+Part 5: Create Report
+================================================================================
+
+Create `/home/sam/DevopsRoadmap/Phase-1-Linux/users-report.txt` containing:
+
+1. Output of `cat /etc/group | grep -E "webdev|dbadmin|deployers"`
+O/P:
+webdev:x:1003:alice,bob
+dbadmin:x:1004:carol
+deployers:x:1005:alice
+
+2. Output of `id alice`, `id bob`, `id carol`
+bob@sam-VMware-Virtual-Platform:~$ id alice
+uid=1003(alice) gid=1006(alice) groups=1006(alice),1003(webdev),1005(deployers)
+bob@sam-VMware-Virtual-Platform:~$ id bob
+uid=1004(bob) gid=1007(bob) groups=1007(bob),1003(webdev)
+bob@sam-VMware-Virtual-Platform:~$ id carol
+uid=1005(carol) gid=1008(carol) groups=1008(carol),1004(dbadmin)
+bob@sam-VMware-Virtual-Platform:~$ 
+
+3. Your sudoers.d/webapp-team file content
+attached above
+
+4. Proof that alice can restart myapp (sudo output)
+attached above
+5. Proof that bob cannot deploy (permission denied)
+6. Proof that carol can run psql as postgres
+
+
+================================================================================
+Part 6: Security Questions
+================================================================================
+
+1. What's the danger of `usermod -G` without `-a`?
+Ans: It will overwrite instead of appending and preserving the current groups.
+
+2. Why use `/etc/sudoers.d/` instead of editing `/etc/sudoers`?
+Ans: Much more managable and easy to track all the sudoers that are added by us.
+
+3. Why should service accounts have `/usr/sbin/nologin` as shell?
+Ans: Its a assume role account mostly used by programs whcih doesnt require shell login and all.
+
+4. How would you find all users who have sudo access?
+Ans: grep inside the sudoer file that have root access and ALL,ALL and ALL commands.

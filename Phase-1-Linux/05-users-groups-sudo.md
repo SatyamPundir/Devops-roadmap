@@ -1255,3 +1255,100 @@ sudo -i                     # Root shell via sudo
 ---
 
 **Complete this mini-task, then we'll move to Module 6: Package Management.**
+
+---
+
+## 📝 **LEARNING LOG (Post Mini-Task)**
+
+**Date:** February 1, 2026  
+**Task Score:** 82/100
+
+### **Issue 1: sudoers Typos Break Everything**
+
+**Problems I encountered:**
+```sudoers
+Cmndd_Alias  → Should be Cmnd_Alias
+ALl          → Should be ALL (case-sensitive!)
+ps_dump      → Should be pg_dump
+myapp.servie → Should be myapp.service
+```
+
+**Lesson:** sudoers parsing is STRICT. One typo = entire file ignored for that section.
+
+**Best practice:**
+```bash
+# Always validate after editing
+$ sudo visudo -c
+/etc/sudoers: parsed OK
+/etc/sudoers.d/webapp-team: parsed OK
+```
+
+---
+
+### **Issue 2: sudoers File Permissions**
+
+**Error:** `bad permissions, should be mode 0440`
+
+**Fix:**
+```bash
+$ sudo chmod 440 /etc/sudoers.d/webapp-team
+```
+
+**Why:** Security measure — if permissions are wrong, sudo assumes file is tampered and ignores it.
+
+---
+
+### **Issue 3: sudo Requires EXACT Command Match**
+
+**My command:**
+```bash
+alice$ sudo systemctl status myapp        # ❌ Denied
+alice$ sudo systemctl status myapp.service  # ✅ Works
+```
+
+**Why:** sudoers entry specified `myapp.service`, so `myapp` alone doesn't match.
+
+**Solutions:**
+1. Always use full service name: `myapp.service`
+2. Or add both forms to sudoers
+3. Or use wildcard: `myapp*` (less secure)
+
+---
+
+### **Issue 4: nologin Shell Security (Complete Understanding)**
+
+**My original answer:** "Doesn't require shell login"
+
+**Complete answer:** Service accounts use `/usr/sbin/nologin` to **prevent interactive shell access if compromised**. Even if attacker gets credentials, they cannot get a shell to explore the system.
+
+---
+
+### **Issue 5: Finding All sudo Users (Complete Method)**
+
+**My original answer:** "grep sudoers for ALL"
+
+**Complete method:**
+```bash
+# 1. Check sudo group members
+$ getent group sudo
+
+# 2. Check sudoers files
+$ sudo grep -r "ALL=" /etc/sudoers /etc/sudoers.d/
+
+# 3. Check specific user permissions
+$ sudo -l -U username
+```
+
+---
+
+### **Key Takeaways from Module 5:**
+
+1. **UID 0 = root**, UID 1-999 = system, UID 1000+ = regular users
+2. **Always use `-aG`** with usermod (not just `-G`!)
+3. **visudo validates syntax** — never edit sudoers directly
+4. **sudoers.d/** for maintainable configs (one file per purpose)
+5. **sudo matches EXACT commands** — including arguments
+6. **File permissions matter** — sudoers needs 0440
+7. **Service accounts:** nologin shell, no home directory
+8. **Groups for permissions** — easier to manage than individual users
+9. **Principle of least privilege** — only grant what's needed
