@@ -1152,3 +1152,92 @@ systemctl --failed               # List failed services
 ---
 
 **Complete this mini-task, then we'll move to Module 5: Users, Groups & sudo.**
+
+---
+
+## 📝 **LEARNING LOG (Post Mini-Task)**
+
+**Date:** January 31, 2026  
+**Task Score:** 91/100
+
+### **Doubt 1: Unit File Location Hierarchy**
+
+**My question:** Does `/etc/systemd/system/` override `/lib/systemd/system/`?
+
+**Answer:** Yes! Search order with first match wins:
+```
+1. /etc/systemd/system/      ← Admin customizations (HIGHEST)
+2. /run/systemd/system/      ← Runtime temporary units
+3. /lib/systemd/system/      ← Package defaults (LOWEST)
+```
+
+**Two customization methods:**
+| Method | When to Use |
+|--------|-------------|
+| Copy full unit to `/etc/systemd/system/` | Complete replacement |
+| Drop-in `.d/override.conf` | Change specific settings only |
+
+**Key benefit:** Package updates don't overwrite admin customizations!
+
+---
+
+### **Doubt 2: What Are Runlevels?**
+
+**My question:** What were the old runlevels that targets replaced?
+
+**Answer:** SysVinit used numbered runlevels (0-6):
+
+| Runlevel | Purpose | systemd Equivalent |
+|----------|---------|-------------------|
+| 0 | Halt/shutdown | `poweroff.target` |
+| 1 | Single-user recovery | `rescue.target` |
+| 3 | Multi-user CLI | `multi-user.target` |
+| 5 | Multi-user GUI | `graphical.target` |
+| 6 | Reboot | `reboot.target` |
+
+**Why targets are better:**
+- Runlevels: Sequential startup (slow)
+- Targets: Parallel with dependency resolution (fast)
+
+```bash
+# Check/change default target
+$ systemctl get-default
+$ sudo systemctl set-default multi-user.target
+```
+
+---
+
+### **Doubt 3: Does reload Change PID?**
+
+**My question:** What happens to PID on reload vs restart?
+
+**Answer:**
+
+| Action | PID Changes? | Downtime? |
+|--------|--------------|-----------|
+| `reload` | ❌ No | Zero |
+| `restart` | ✅ Yes | Brief |
+
+```
+reload:  Process stays alive, reads new config via SIGHUP
+restart: Process killed (SIGTERM), new process started
+```
+
+**For nginx specifically:**
+- Master PID stays same on reload
+- Worker PIDs change (graceful replacement)
+- Zero dropped connections!
+
+---
+
+### **Key Takeaways from Module 4:**
+
+1. **systemd** = init system + service manager (PID 1)
+2. **Unit files** define services in `/etc/systemd/system/` or `/lib/systemd/system/`
+3. **`systemctl`** is the main command: start, stop, restart, reload, enable, disable
+4. **`enable`** = start on boot (creates symlink), **`start`** = start now
+5. **`reload`** = zero-downtime config update (if supported), **`restart`** = full stop/start
+6. **`journalctl -u <service>`** for logs — catches config errors!
+7. **Drop-in overrides** (`systemctl edit`) preserve customizations across package updates
+8. **Always run services as non-root** — principle of least privilege
+9. **Targets** replaced runlevels — parallel startup with dependencies

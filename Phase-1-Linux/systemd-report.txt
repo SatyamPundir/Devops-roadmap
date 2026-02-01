@@ -1,0 +1,281 @@
+========================== Process management Report =================================================
+Date: January 31, 2026
+Student: Sam
+Module: 4 - systemd service
+
+================================================================================
+Part 1: Create An Application
+================================================================================
+sam@sam-VMware-Virtual-Platform:~/webapp$ ls -la
+total 12
+drwxrwxr-x  2 sam sam 4096 Jan 31 13:33 .
+drwxr-x--- 22 sam sam 4096 Jan 31 13:28 ..
+-rwxrwxr-x  1 sam sam  558 Jan 31 13:33 app.py
+sam@sam-VMware-Virtual-Platform:~/webapp$ pwd
+/home/sam/webapp
+
+================================================================================
+Part 2: Create An Application
+================================================================================
+Create /etc/systemd/system/myapp.service with:
+
+Proper description
+Runs as your user
+WorkingDirectory set correctly
+Restarts on failure
+Environment variable APP_ENV=production
+
+sam@sam-VMware-Virtual-Platform:~/webapp$ cat /etc/systemd/system/myapp.service 
+[Unit]
+Description=Dummy Pyhton Application
+
+[Service]
+Type=simple
+User=sam
+Group=sam
+WorkingDirectory=/home/sam/webapp
+Restart=always
+Enviroment="APP_ENV=production"
+
+ExecStart=/home/sam/webapp/venv/bin/python app.py
+
+[Install]
+WantedBy=multi-user.target
+
+I also created the virtual Env.
+
+================================================================================
+Part 3: Tasks
+================================================================================
+1. Basic Management:
+
+    Start the service
+    Check its status (note the PID)
+    View logs with journalctl
+    Stop the service
+
+o/p:
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo systemctl daemon-reload
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl start myapp.service
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp.service
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-01-31 16:27:09 IST; 13s ago
+   Main PID: 13710 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 3.9M)
+        CPU: 15ms
+     CGroup: /system.slice/myapp.service
+             └─13710 /home/sam/webapp/venv/bin/python app.py
+
+Jan 31 16:27:09 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+
+Logs:
+sam@sam-VMware-Virtual-Platform:~/webapp$ journalctl -u myapp
+Jan 31 16:26:07 sam-VMware-Virtual-Platform systemd[1]: /etc/systemd/system/myapp.service:10: Unknown key name 'Enviroment' in section 'Service', ignoring.
+Jan 31 16:26:07 sam-VMware-Virtual-Platform systemd[1]: /etc/systemd/system/myapp.service:10: Unknown key name 'Enviroment' in section 'Service', ignoring.
+Jan 31 16:26:07 sam-VMware-Virtual-Platform systemd[1]: /etc/systemd/system/myapp.service:10: Unknown key name 'Enviroment' in section 'Service', ignoring.
+Jan 31 16:27:05 sam-VMware-Virtual-Platform systemd[1]: /etc/systemd/system/myapp.service:10: Unknown key name 'Enviroment' in section 'Service', ignoring.
+Jan 31 16:27:09 sam-VMware-Virtual-Platform systemd[1]: /etc/systemd/system/myapp.service:10: Unknown key name 'Enviroment' in section 'Service', ignoring.
+Jan 31 16:27:09 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: Application starting at 2026-01-31 16:27:09.080535
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: PID: 13710
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:09.080628] Heartbeat #1
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:19.080872] Heartbeat #2
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:29.081219] Heartbeat #3
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:39.081571] Heartbeat #4
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:49.081922] Heartbeat #5
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:27:59.082502] Heartbeat #6
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:09.083057] Heartbeat #7
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:19.083249] Heartbeat #8
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:29.083626] Heartbeat #9
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:39.084251] Heartbeat #10
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:49.084729] Heartbeat #11
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:28:59.085563] Heartbeat #12
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:09.086973] Heartbeat #13
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:19.087596] Heartbeat #14
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:29.088141] Heartbeat #15
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:39.088693] Heartbeat #16
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:49.089273] Heartbeat #17
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:29:59.090201] Heartbeat #18
+Jan 31 16:31:31 sam-VMware-Virtual-Platform python[13710]: [2026-01-31 16:30:09.091102] Heartbeat #19
+
+// I reloaded the config as i misspelled in environment first time.
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl stop myapp
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp
+○ myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+     Active: inactive (dead)
+
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:53.777884] Heartbeat #6
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:03.778340] Heartbeat #7
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:13.778754] Heartbeat #8
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:23.779259] Heartbeat #9
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:33.779789] Heartbeat #10
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:43.780107] Heartbeat #11
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: Received signal 15, shutting down gracefully...
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: Stopping myapp.service - Dummy Pyhton Application...
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: myapp.service: Deactivated successfully.
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: Stopped myapp.service - Dummy Pyhton Application.
+
+2. Boot Persistence:
+
+    Enable the service for boot
+    Verify with is-enabled
+    Disable it
+O/p:
+sam@sam-VMware-Virtual-Platform:~/webapp$ sudo systemctl enable myapp
+Created symlink /etc/systemd/system/multi-user.target.wants/myapp.service → /etc/systemd/system/myapp.service.
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl is-enabled myapp
+enabled
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl disable myapp
+Removed "/etc/systemd/system/multi-user.target.wants/myapp.service".
+
+3. Signal Handling:
+
+    Start the service
+    Send SIGHUP using systemctl kill -s HUP myapp
+    Check logs to see "would reload config"
+    Stop gracefully, verify "shutting down gracefully" in logs
+
+    sam@sam-VMware-Virtual-Platform:~/webapp$ journalctl -u myapp --since "2026-01-31 16:33:23.779259"
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: Application starting at 2026-01-31 16:32:03.775353
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: PID: 14866
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:03.775383] Heartbeat #1
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:13.776148] Heartbeat #2
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:23.776992] Heartbeat #3
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:33.777180] Heartbeat #4
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:43.777688] Heartbeat #5
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:32:53.777884] Heartbeat #6
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:03.778340] Heartbeat #7
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:13.778754] Heartbeat #8
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:23.779259] Heartbeat #9
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:33.779789] Heartbeat #10
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: [2026-01-31 16:33:43.780107] Heartbeat #11
+Jan 31 16:33:49 sam-VMware-Virtual-Platform python[14866]: Received signal 15, shutting down gracefully...
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: Stopping myapp.service - Dummy Pyhton Application...
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: myapp.service: Deactivated successfully.
+Jan 31 16:33:49 sam-VMware-Virtual-Platform systemd[1]: Stopped myapp.service - Dummy Pyhton Application.
+Jan 31 16:37:17 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-01-31 16:37:17 IST; 6min ago
+   Main PID: 16307 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 4.0M)
+        CPU: 22ms
+     CGroup: /system.slice/myapp.service
+             └─16307 /home/sam/webapp/venv/bin/python app.py
+
+Jan 31 16:37:17 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+
+4. Auto-Restart Test:
+
+    Start the service
+    Kill it with kill -9 <PID>
+    Verify systemd restarted it (new PID)
+
+O/p:
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-01-31 16:37:17 IST; 7min ago
+   Main PID: 16307 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 4.0M)
+        CPU: 23ms
+     CGroup: /system.slice/myapp.service
+             └─16307 /home/sam/webapp/venv/bin/python app.py
+
+Jan 31 16:37:17 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+sam@sam-VMware-Virtual-Platform:~/webapp$ kill -9 16307
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-01-31 16:45:36 IST; 6s ago
+   Main PID: 17655 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 3.8M)
+        CPU: 15ms
+     CGroup: /system.slice/myapp.service
+             └─17655 /home/sam/webapp/venv/bin/python app.py
+
+Jan 31 16:45:36 sam-VMware-Virtual-Platform systemd[1]: myapp.service: Failed with result 'signal'.
+Jan 31 16:45:36 sam-VMware-Virtual-Platform systemd[1]: myapp.service: Scheduled restart job, restart counter is at 1.
+Jan 31 16:45:36 sam-VMware-Virtual-Platform systemd[1]: Started myapp.service - Dummy Pyhton Application.
+
+5. Override Configuration:
+
+    Use systemctl edit myapp to add:
+        RestartSec=2 (faster restart)
+        Environment="DEBUG=true"
+    Apply and verify changes
+
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl status myapp
+● myapp.service - Dummy Pyhton Application
+     Loaded: loaded (/etc/systemd/system/myapp.service; disabled; preset: enabled)
+    Drop-In: /etc/systemd/system/myapp.service.d
+             └─override.conf
+     Active: active (running) since Sat 2026-01-31 16:45:36 IST; 5min ago
+   Main PID: 17655 (python)
+      Tasks: 1 (limit: 6955)
+     Memory: 3.7M (peak: 3.8M)
+        CPU: 19ms
+     CGroup: /system.slice/myapp.service
+             └─17655 /home/sam/webapp/venv/bin/python app.py
+Drop-In its visible that we have a override.conf
+
+
+sam@sam-VMware-Virtual-Platform:~/webapp$ systemctl cat myapp
+# /etc/systemd/system/myapp.service
+[Unit]
+Description=Dummy Pyhton Application
+
+[Service]
+Type=simple
+User=sam
+Group=sam
+WorkingDirectory=/home/sam/webapp
+Restart=always
+Environment="APP_ENV=production"
+
+ExecStart=/home/sam/webapp/venv/bin/python app.py
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/myapp.service.d/override.conf
+[Service]
+RestartSec=2
+Environment="DEBUG=true"
+sam@sam-VMware-Virtual-Platform:~/webapp$ 
+
+================================================================================
+Part 6: Security Questions
+================================================================================
+
+1. Why should services run as non-root users?
+Ans: To avoid any malicious full access gain via any malicious code.
+
+2. What's the difference between `Wants=` and `Requires=`?
+Ans: Wants - can try to start (conditional) and Requires="Absolute Necessary to start the service.
+
+3. When would you use `Type=forking` vs `Type=simple`?
+Ans:
+Forking = For Deamons, low latency subprocess
+simple = For normal basic application like python, golang etx
+
+4. How do drop-in overrides help with package updates?
+Ans: By drop-in files in /etc/systemd/system/<unit>.d/*.conf 
+
+Doubts:
+1) Location hierarchy (priority order):
+/etc/systemd/system/      ← Admin customizations (highest priority)
+/run/systemd/system/      ← Runtime units
+/lib/systemd/system/      ← Package defaults (lowest priority)
+
+does this mean it override scenario? i mean deafaults are configs are packaged when we install the program and we can overwrite tha using etc/systemd/system ? or its different all together.
+
+2) 3. Targets — Groups of units (like old runlevels) what are old runlevels
+3) When we reload the service does it get assigned a new PID ? and what happens for other cases like restart, etc?
