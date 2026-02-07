@@ -34,13 +34,13 @@
 | 3 | Process Management | 92% | ✅ Complete |
 | 4 | System Services (systemd) | 91% | ✅ Complete |
 | 5 | Users, Groups & sudo | 82% | ✅ Complete |
-| 6 | Package Management | — | 📖 Reading |
-| 7 | Text Processing | — | 🔜 Upcoming |
+| 6 | Package Management | 86% | ✅ Complete |
+| 7 | Text Processing | — | 📖 Reading |
 | 8 | Monitoring & Logs | — | 🔜 Upcoming |
 | 9 | Networking Basics | — | 🔜 Upcoming |
 | 10 | Disk & Storage | — | 🔜 Upcoming |
 
-**Average Score (Modules 1-5):** 89%
+**Average Score (Modules 1-6):** 88.5%
 
 ---
 

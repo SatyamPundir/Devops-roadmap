@@ -1,0 +1,313 @@
+========================== Package MANAGEMENT =================================================
+Date: February 7, 2026
+Student: Sam
+Module: 6 - Package MANAGEMENT
+
+==============================================================
+
+==============================================================
+Part 1: System Update
+==============================================================
+
+# 1. Update package lists
+    sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt update
+[sudo] password for sam: 
+Hit:1 https://dl.google.com/linux/chrome/deb stable InRelease
+Hit:2 http://in.archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://in.archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://in.archive.ubuntu.com/ubuntu noble-backports InRelease
+Get:5 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:6 http://security.ubuntu.com/ubuntu noble-security/main amd64 Components [21.5 kB]
+Get:7 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Components [212 B]
+Get:8 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Components [74.2 kB]
+Get:9 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [208 B]
+Fetched 222 kB in 2s (109 kB/s)                                          
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+55 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+# 2. Check how many packages can be upgraded
+    sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt list --upgradeable | wc -l
+
+    WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+    56
+
+# 3. List the upgradable packages
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt list --upgradeable
+Listing... Done
+alsa-ucm-conf/noble-updates 1.2.10-1ubuntu5.9 all [upgradable from: 1.2.10-1ubuntu5.7]
+fwupd/noble-updates 1.9.33-0ubuntu1~24.04.1ubuntu1 amd64 [upgradable from: 1.9.31-0ubuntu1~24.04.1]
+gdm3/noble-updates 46.2-1ubuntu1~24.04.6 amd64 [upgradable from: 46.2-1ubuntu1~24.04.5]
+gir1.2-gdm-1.0/noble-updates 46.2-1ubuntu1~24.04.6 amd64 [upgradable from: 46.2-1ubuntu1~24.04.5]
+gir1.2-mutter-14/noble-updates 46.2-1ubuntu0.24.04.14 amd64 [upgradable from: 46.2-1ubuntu0.24.04.13]
+gir1.2-nm-1.0/noble-updates 1.46.0-1ubuntu2.5 amd64 [upgradable from: 1.46.0-1ubuntu2.4]
+.
+.
+.
+xwayland/noble-updates 2:23.2.6-1ubuntu0.8 amd64 [upgradable from: 2:23.2.6-1ubuntu0.7]
+
+# 4. Perform the upgrade
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt upgrade
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Calculating upgrade... Done
+The following package was automatically installed and is no longer required:
+  libllvm19
+Use 'sudo apt autoremove' to remove it.
+The following NEW packages will be installed:
+  linux-headers-6.17.0-14-generic linux-hwe-6.17-headers-6.17.0-14 linux-hwe-6.17-tools-6.17.0-14 linux-image-6.17.0-14-generic
+  linux-modules-6.17.0-14-generic linux-modules-extra-6.17.0-14-generic linux-tools-6.17.0-14-generic
+The following upgrades have been deferred due to phasing:
+  language-pack-en-base language-pack-gnome-en
+The following packages have been kept back:
+  language-pack-en language-pack-gnome-en-base
+The following packages will be upgraded:
+  alsa-ucm-conf fwupd gdm3 gir1.2-gdm-1.0 gir1.2-mutter-14 gir1.2-nm-1.0 gnome-remote-desktop gnome-shell gnome-shell-common google-chrome-stable ldap-utils
+  libdrm-amdgpu1 libdrm-common libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 libdrm2 libegl-mesa0 libfwupd2 libgbm1 libgdm1 libgl1-mesa-dri libglx-mesa0
+  libldap-common libldap2 libmutter-14-0 libnm0 libnuma1 libqpdf29t64 libxatracker2 linux-firmware linux-generic-hwe-24.04 linux-headers-generic-hwe-24.04
+  linux-image-generic-hwe-24.04 linux-libc-dev linux-tools-common mesa-libgallium mesa-vulkan-drivers mutter-common mutter-common-bin network-manager
+  network-manager-config-connectivity-ubuntu numactl python-apt-common python3-apt python3-distupgrade snapd thermald ubuntu-release-upgrader-core
+  ubuntu-release-upgrader-gtk xwayland
+51 upgraded, 7 newly installed, 0 to remove and 4 not upgraded.
+Need to get 952 MB of archives.
+After this operation, 357 MB of additional disk space will be used.
+N: Some packages may have been kept back due to phasing.
+Do you want to continue? [Y/n] Y
+Get:1 https://dl.google.com/linux/chrome/deb stable/main amd64 google-chrome-stable amd64 144.0.7559.132-1 [119 MB]
+Get:2 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgl1-mesa-dri amd64 25.2.8-0ubuntu0.24.04.1 [37.9 kB]
+Get:3 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libdrm-common all 2.4.125-1ubuntu0.1~24.04.1 [9,174 B]
+Get:4 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libdrm2 amd64 2.4.125-1ubuntu0.1~24.04.1 [41.3 kB]
+Get:5 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglx-mesa0 amd64 25.2.8-0ubuntu0.24.04.1 [110 kB]
+Get:6 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libdrm-amdgpu1 amd64 2.4.125-1ubuntu0.1~24.04.1 [21.4 kB]
+Get:7 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libdrm-intel1 amd64 2.4.125-1ubuntu0.1~24.04.1 [63.8 kB]
+Get:8 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libegl-mesa0 amd64 25.2.8-0ubuntu0.24.04.1 [117 kB]                                        
+Get:9 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgbm1 amd64 25.2.8-0ubuntu0.24.04.1 [34.2 kB]                                            
+Get:10 http://in.archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-libgallium amd64 25.2.8-0ubuntu0.24.04.1 [10.8 MB]  
+
+==============================================================
+Part 2: Package Installation
+==============================================================
+
+# 1. Search for the 'htop' package
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt search ^htop$
+Sorting... Done
+Full Text Search... Done
+htop/noble,now 3.3.0-4build1 amd64 [installed]
+  interactive processes viewer
+
+# 2. Show details about htop
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt show htop
+Package: htop
+Version: 3.3.0-4build1
+Priority: optional
+Section: utils
+Origin: Ubuntu
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Original-Maintainer: Daniel Lange <DLange@debian.org>
+Bugs: https://bugs.launchpad.net/ubuntu/+filebug
+Installed-Size: 434 kB
+Depends: libc6 (>= 2.38), libncursesw6 (>= 6), libnl-3-200 (>= 3.2.7), libnl-genl-3-200 (>= 3.2.7), libtinfo6 (>= 6)
+Suggests: lm-sensors, lsof, strace
+Homepage: https://htop.dev/
+Task: cloud-image, cloud-image, server, ubuntu-server-raspi, lubuntu-desktop, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop-minimal, ubuntu-budgie-desktop, ubuntu-budgie-desktop-raspi
+Download-Size: 171 kB
+APT-Manual-Installed: yes
+APT-Sources: http://in.archive.ubuntu.com/ubuntu noble/main amd64 Packages
+Description: interactive processes viewer
+ Htop is an ncursed-based process viewer similar to top, but it
+ allows one to scroll the list vertically and horizontally to see
+ all processes and their full command lines.
+ .
+ Tasks related to processes (killing, renicing) can be done without
+ entering their PIDs.
+
+# 3. Install htop
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt install htop
+[sudo] password for sam: 
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+htop is already the newest version (3.3.0-4build1).
+The following package was automatically installed and is no longer required:
+  libllvm19
+Use 'sudo apt autoremove' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 4 not upgraded.
+
+# 4. Verify installation by running htop
+yes its working
+
+# 5. Find which package provides /usr/bin/htop
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ dpkg -S /usr/bin/htop
+htop: /usr/bin/htop
+# 6. List all files installed by htop
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ dpkg -L htop
+/.
+/usr
+/usr/bin
+/usr/bin/htop
+/usr/share
+/usr/share/applications
+/usr/share/applications/htop.desktop
+/usr/share/doc
+/usr/share/doc/htop
+/usr/share/doc/htop/AUTHORS
+/usr/share/doc/htop/README.gz
+/usr/share/doc/htop/changelog.Debian.gz
+/usr/share/doc/htop/copyright
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/scalable
+/usr/share/icons/hicolor/scalable/apps
+/usr/share/icons/hicolor/scalable/apps/htop.svg
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/htop.1.gz
+/usr/share/pixmaps
+/usr/share/pixmaps/htop.png
+
+==============================================================
+Part 3: Package Information
+==============================================================
+
+# 1. List all installed packages containing 'python'
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ dpkg -l | grep python
+ii  libpython3-stdlib:amd64                       3.12.3-0ubuntu2.1                        amd64        interactive high-level object-oriented language (default python3 version)
+ii  libpython3.12-minimal:amd64                   3.12.3-1ubuntu0.11                       amd64        Minimal subset of the Python language (version 3.12)
+ii  6.0.1-2build2                            amd64        YAML parser and emitter for Python3
+.
+.
+.
+ii  python3.12                                    3.12.3-1ubuntu0.11                       amd64        Interactive high-level object-oriented language (version 3.12)
+ii  python3.12-minimal                            3.12.3-1ubuntu0.11                       amd64        Minimal subset of the Python language (version 3.12)
+ii  python3.12-venv                               3.12.3-1ubuntu0.11                       amd64        Interactive high-level object-oriented language (pyvenv binary, version 3.12)
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+# 2. Check what packages nginx depends on
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt depends nginx
+nginx
+  Depends: libc6 (>= 2.34)
+  Depends: libcrypt1 (>= 1:4.1.0)
+  Depends: libpcre2-8-0 (>= 10.22)
+  Depends: libssl3t64 (>= 3.0.0)
+  Depends: zlib1g (>= 1:1.1.4)
+  Depends: iproute2
+  Depends: nginx-common (= 1.24.0-2ubuntu7.5)
+  Breaks: nginx-core (<< 1.22.1-6~)
+  Breaks: nginx-extras (<< 1.22.1-6~)
+  Breaks: nginx-light (<< 1.22.1-6~)
+  Replaces: nginx-core (<< 1.22.1-6~)
+  Replaces: nginx-extras (<< 1.22.1-6~)
+  Replaces: nginx-light (<< 1.22.1-6~)
+
+# 3. Check what version of openssl is installed
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt list --installed | grep ^openssl
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+openssl/noble-updates,noble-security,now 3.0.13-0ubuntu3.7 amd64 [installed,automatic]
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ which openssl
+/usr/bin/openssl
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ openssl version
+OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+# 4. Find the changelog for a recent update
+openssl (3.0.13-0ubuntu3.7) noble-security; urgency=medium
+
+  * SECURITY UPDATE: Stack buffer overflow in CMS AuthEnvelopedData parsing
+    - debian/patches/CVE-2025-15467-1.patch: correct handling of
+      AEAD-encrypted CMS with inadmissibly long IV in crypto/evp/evp_lib.c.
+    - debian/patches/CVE-2025-15467-2.patch: some comments to clarify
+      functions usage in crypto/asn1/evp_asn1.c.
+    - debian/patches/CVE-2025-15467-3.patch: test for handling of
+      AEAD-encrypted CMS with inadmissibly long IV in test/cmsapitest.c,
+      test/recipes/80-test_cmsapi.t,
+      test/recipes/80-test_cmsapi_data/encDataWithTooLongIV.pem.
+    - CVE-2025-15467
+  * SECURITY UPDATE: Heap out-of-bounds write in BIO_f_linebuffer on short
+    writes
+    - debian/patches/CVE-2025-68160.patch: fix heap buffer overflow in
+      BIO_f_linebuffer in crypto/bio/bf_lbuf.c.
+    - CVE-2025-68160
+  * SECURITY UPDATE: Unauthenticated/unencrypted trailing bytes with
+    low-level OCB function calls
+    - debian/patches/CVE-2025-69418.patch: fix OCB AES-NI/HW stream path
+      unauthenticated/unencrypted trailing bytes in crypto/modes/ocb128.c.
+    - CVE-2025-69418
+  * SECURITY UPDATE: Out of bounds write in PKCS12_get_friendlyname() UTF-8
+
+==============================================================
+Part 4: Package Holds
+==============================================================
+
+# 1. Put a hold on the 'nginx' package
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt-mark hold nginx
+nginx set on hold.
+# 2. Verify the hold is in place
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ apt-mark showhold
+nginx
+# 3. Remove the hold
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt-mark unhold nginx
+Canceled hold on nginx.
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+==============================================================
+Part 5: Cleanup
+==============================================================
+
+# 1. Remove a package you installed (htop)
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt purge htop
+# 2. Clean the package cache
+its taken care as i used purge
+# 3. Remove orphaned packages
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo apt autoremove
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages will be REMOVED:
+  libllvm19
+0 upgraded, 0 newly installed, 1 to remove and 4 not upgraded.
+After this operation, 129 MB disk space will be freed.
+Do you want to continue? [Y/n] y
+(Reading database ... 198451 files and directories currently installed.)
+Removing libllvm19:amd64 (1:19.1.1-1ubuntu1~24.04.2) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+# 4. Check cache size before and after
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo du -sh /var/cache/apt/archives/
+2.4M    /var/cache/apt/archives/
+
+
+Part 6: Create Report
+
+Create `/home/sam/DevopsRoadmap/Phase-1-Linux/package-report.txt` containing:
+
+1. Number of packages that were upgradable
+2. Output of `apt show htop`
+3. Output of `dpkg -L htop` (first 20 lines)
+4. Output of `apt-mark showhold` (showing nginx held)
+5. Cache size before and after `apt clean`
+
+Done creaated in above parts
+
+
+**Security Questions:**
+
+1. Why should you run `apt update` before `apt install`?
+Ans: So that we can get list of all the upgradable files and update the origins from where it should be fetched
+
+2. What's the difference between `apt remove` and `apt purge`?
+Ans: Apt remove only removes the packages, but leaves out the configs. Apt purge remove the pkg and the config.
+
+3. Why would you hold a package?
+Ans: If we are uncertain of the stablity of the new version, or we are yet to check working of our project with new package. we would like to prevent auto update
+
+4. What does `apt autoremove` do and when should you run it?
+ANs: it removes orphanded dependencies which are not used now. We should ideally run it after we unistall a package.
+
+5. Why do repositories need GPG keys?
+Ans: to establish trust, ensure the authenticity of the content, and guarantee that the data has not been tampered.

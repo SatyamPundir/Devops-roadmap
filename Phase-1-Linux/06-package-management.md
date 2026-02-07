@@ -1012,3 +1012,59 @@ sudo dpkg-reconfigure package    # Reconfigure package
 ---
 
 **Complete this mini-task, then we'll move to Module 7: Text Processing.**
+
+---
+
+## 📓 Learning Log
+
+**Date:** February 7, 2026
+**Module:** 06 - Package Management
+**Grade:** 86/100
+
+### Key Confusion Resolved
+
+**Issue:** Confused `apt purge` with `apt clean`
+
+| Command | What It Does | What Gets Deleted |
+|---------|--------------|-------------------|
+| `apt remove` | Uninstall package | Binaries only, keeps config |
+| `apt purge` | Uninstall package + config | Binaries + `/etc/` config files |
+| `apt clean` | Clear download cache | `/var/cache/apt/archives/*.deb` |
+| `apt autoclean` | Clear OLD cache | Only outdated `.deb` files |
+
+**Memory trick:**
+- `purge` = purge the package from system
+- `clean` = clean the download folder
+
+### Security Questions - Key Learnings
+
+1. **`apt update`** refreshes the package INDEX (list of available versions), not the packages themselves
+2. **GPG keys** verify that packages haven't been tampered with during download
+3. **Holding packages** is critical when:
+   - Testing application compatibility
+   - Waiting for team-wide approval
+   - Maintaining specific certified versions
+
+### Commands to Remember
+
+```bash
+# Check what will be affected before upgrading
+apt list --upgradable
+
+# View package changelog for security info
+apt changelog openssl
+
+# Find which package owns a file
+dpkg -S /path/to/file
+
+# Check cache size
+du -sh /var/cache/apt/archives/
+```
+
+### Production Takeaway
+
+Always know the difference between removing a PACKAGE and clearing the CACHE. In production:
+- `purge` when decommissioning services permanently
+- `remove` when you might reinstall later
+- `clean` during disk space emergencies
+- `autoremove` after major uninstalls
