@@ -1,0 +1,104 @@
+========================== Text Processing ===================================
+Date: February 22, 2026
+Student: Sam
+Module: 6 - Text Processing
+
+==============================================================
+
+==============================================================
+Analysis Tasks
+==============================================================
+1. Count total requests: How many log entries?
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ wc -l /tmp/access.log 
+12 /tmp/access.log
+
+2. Unique IPs: List all unique IP addresses
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{print $1}' | sort | uniq
+192.168.1.100
+192.168.1.101
+192.168.1.102
+192.168.1.103
+192.168.1.104
+192.168.1.105
+
+3. Requests per IP: Count requests from each IP, sorted by count (descending)
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{print $1}' | sort | uniq -c | sort -rk 1
+      5 192.168.1.100
+      2 192.168.1.102
+      2 192.168.1.101
+      1 192.168.1.105
+      1 192.168.1.104
+      1 192.168.1.103
+
+4. HTTP Status Distribution: Count of each status code (200, 404, 500, etc.)
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{print $8}' | sort | uniq -c
+      6 200
+      1 204
+      1 401
+      1 403
+      1 404
+      2 500
+
+5. Find Errors: Show all lines with status codes 4xx or 5xx
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | grep -E "([45][0-9][0-9])"
+192.168.1.102 - - [07/Feb/2026:10:15:35] "GET /api/products HTTP/1.1" 404 45 0.02
+192.168.1.100 - - [07/Feb/2026:10:15:36] "GET /api/orders HTTP/1.1" 500 123 5.23
+192.168.1.103 - - [07/Feb/2026:10:15:37] "POST /api/login HTTP/1.1" 401 67 0.08
+192.168.1.104 - - [07/Feb/2026:10:15:39] "GET /admin HTTP/1.1" 403 89 0.01
+192.168.1.100 - - [07/Feb/2026:10:15:40] "GET /api/orders HTTP/1.1" 500 123 6.12
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+6. Slowest Requests: Find requests taking > 1 second
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '$10>1'
+192.168.1.100 - - [07/Feb/2026:10:15:36] "GET /api/orders HTTP/1.1" 500 123 5.23
+192.168.1.100 - - [07/Feb/2026:10:15:40] "GET /api/orders HTTP/1.1" 500 123 6.12
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+7. Most Popular Endpoints: Top 3 most requested paths
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{print $6}' | sort | uniq -c | sort -r | head -n 3
+      4 /api/users
+      2 /api/products
+      2 /api/orders
+
+8. Extract Failed Logins: Find all 401 responses and show their IPs
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | grep -E "401" | awk '{print $1, $8}'
+192.168.1.103 401
+
+9. Calculate Average Response Time: What's the average response time (last field)?
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{sum += $10; count+=1} END {print "Avg: ", sum/count}'
+Avg:  1
+
+
+10. Transform Data: Create a CSV with: IP,Status,ResponseTime
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ cat /tmp/access.log | awk '{print $1,",",$8,",",$10}'>result.csv
+
+==============================================================
+Security Questions:
+==============================================================
+
+1. Why is sort required before uniq?
+Ans: Because it only works on the adjacent duplicates, that why sort it prevent unexpected outputs.
+
+2. What's the difference between grep "error" and grep -w "error"?
+Ans: Grep error matches anything containing error , eg: "ThisIserror" will also be matched.
+But the -w "error" will match the word exactly.
+
+3. Why use sed -i.bak instead of sed -i?
+Ans: It makes a backup, as precaution if inplace edit was wrong and we might end up losing out data.
+
+4. When would you use awk instead of cut?
+Ans: Use awk when you want to do logical operation on the input while processing, like addition of a column or comparing etc.
+
+5. What does tail -f do and why is it critical for production?
+Ans: it follows from the tail, for any any file. it will continously follow that is essential for production for continous monitoring.
+
+6. Show your commands AND their output for each task!
+Ans: Attached above with each question.
+
+
+

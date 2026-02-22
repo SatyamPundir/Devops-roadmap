@@ -1144,3 +1144,87 @@ Create `/home/sam/DevopsRoadmap/Phase-1-Linux/text-report.txt` with:
 ---
 
 **Show your commands AND their output for each task!**
+
+---
+
+## 📓 Learning Log
+
+**Date:** February 22, 2026
+**Module:** 07 - Text Processing
+**Grade:** 87/100
+
+### Mistakes & Corrections
+
+**Mistake 1 — Task 5: `grep` on structured logs can false-match**
+
+Used `grep -E "([45][0-9][0-9])"` which scans the ENTIRE line. If a URL path contains "404" (e.g. `/error-404-page`), a 200 response would be falsely flagged.
+
+```bash
+# What I did (risky)
+grep -E "([45][0-9][0-9])" access.log
+
+# Correct — target field 8 specifically
+awk '$8 ~ /^[45]/' access.log
+```
+
+**Rule:** On structured/columnar data (logs, CSVs), use `awk '$FIELD ~ /pattern/'` not raw `grep`.
+
+---
+
+**Mistake 2 — Task 7: `sort -r` is alphabetical, not numeric**
+
+Used `sort -r` which sorts text in reverse alphabetical order. With tied counts, it broke ties alphabetically and silently dropped `/api/login` (also at 2 requests) before `head -3`.
+
+```bash
+# What I did (alphabetical, unreliable for numbers)
+sort | uniq -c | sort -r | head -3
+
+# Correct — sort -rn for numeric descending
+sort | uniq -c | sort -rn | head -3
+```
+
+**Rule:** Always use `-n` when sorting counts or any numeric column.
+
+---
+
+**Mistake 3 — Task 10: Commas as separate awk arguments add spaces**
+
+```bash
+# What I did — comma separates print arguments, awk uses OFS (space) between them
+awk '{print $1,",",$8,",",$10}'   ->   192.168.1.100 , 200 , 0.05
+
+# Correct — embed commas inside the string literal
+awk '{print $1","$8","$10}'        ->   192.168.1.100,200,0.05
+```
+
+**Rule:** In `awk print`, comma = OFS separator (space by default). To avoid spaces, concatenate with string literals directly, or set `OFS=','`.
+
+---
+
+### Commands to Remember
+
+```bash
+# Safe status-code filtering on logs
+awk '$8 ~ /^[45]/' access.log
+
+# Always numeric sort on counts
+sort | uniq -c | sort -rn | head -N
+
+# Clean CSV from awk
+awk '{print $1","$8","$10}' file
+# OR set OFS
+awk 'BEGIN{OFS=","} {print $1,$8,$10}' file
+
+# Follow logs live in production
+tail -F /var/log/app.log | grep --line-buffered "ERROR"
+```
+
+### Production Takeaway
+
+Text processing tools are deceptively simple — each has one subtle trap:
+- `grep` -> scans whole line, not just a field
+- `sort -r` -> alphabetical unless you add `-n`
+- `awk print ,` -> adds OFS (space) between args
+- `uniq` -> only works on adjacent lines, always sort first
+
+Knowing the traps is what separates a script that works in testing from one that silently lies to you in production at 3 AM.
