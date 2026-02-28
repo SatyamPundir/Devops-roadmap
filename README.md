@@ -36,11 +36,11 @@
 | 5 | Users, Groups & sudo | 82% | ✅ Complete |
 | 6 | Package Management | 86% | ✅ Complete |
 | 7 | Text Processing | 87% | ✅ Complete |
-| 8 | Monitoring & Logs | — | 📖 Reading |
-| 9 | Networking Basics | — | 🔜 Upcoming |
+| 8 | Monitoring & Logs | 89% | ✅ Complete |
+| 9 | Networking Basics | — | 📖 Reading |
 | 10 | Disk & Storage | — | 🔜 Upcoming |
 
-**Average Score (Modules 1-7):** 88.9%
+**Average Score (Modules 1-8):** 88.9%
 
 ---
 
@@ -86,4 +86,4 @@ DevopsRoadmap/
 
 ---
 
-**Last Updated**: February 22, 2026
+**Last Updated**: February 28, 2026

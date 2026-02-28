@@ -1,0 +1,382 @@
+========================== Monitoring Logs ===================================
+Date: February 28, 2026
+Student: Sam
+Module: 8 - Monitoring Logs
+
+==============================================================
+
+==============================================================
+**Part 1: Performance Snapshot**
+==============================================================
+
+Run these and save output:
+
+1. **Load check**: `uptime` — what is the load average? How does it compare to your core count?
+Ans: 
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ uptime
+ 15:19:34 up  2:05,  1 user,  load average: 0.18, 0.06, 0.01
+Load Average for last 1min, 5min, 15min are 0.18, 0.06, 0.01 respectively.
+I have total of 4 Cores so, only around 4.5% utilisation of core from last 1 min.
+
+2. **CPU breakdown**: Run `top -bn1 | head -20` (non-interactive, 1 batch) — what % is idle?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ top -bn1 | head -20
+top - 15:24:07 up  2:10,  1 user,  load average: 0.00, 0.04, 0.00
+Tasks: 343 total,   1 running, 342 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  9.3 us,  2.3 sy,  0.0 ni, 88.4 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+MiB Mem :   5877.9 total,   1009.5 free,   2497.6 used,   2817.7 buff/cache     
+MiB Swap:   4096.0 total,   4096.0 free,      0.0 used.   3380.2 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   3532 sam       20   0   48.5g 215228 171356 S   9.1   3.6   5:21.76 code
+   3534 sam       20   0 1395.3g 464124 188992 S   9.1   7.7   3:36.94 code
+   3579 sam       20   0 1393.6g 362932  88700 S   9.1   6.0   0:38.86 code
+   8357 sam       20   0   11840   5640   3448 R   9.1   0.1   0:00.02 top
+      1 root      20   0   23592  14908   9788 S   0.0   0.2   0:03.12 systemd
+      2 root      20   0       0      0      0 S   0.0   0.0   0:00.04 kthreadd
+      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 pool_wo+
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+      7 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+     11 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+Ans: 88.4% is idle CPU.
+
+
+3. **Memory status**: `free -h` — how much is available vs total?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           5.7Gi       2.4Gi       1.0Gi       158Mi       2.8Gi       3.3Gi
+Swap:          4.0Gi          0B       4.0Gi
+
+Ans: Total is 5.7GB of ram and currently available is 3.3GB
+
+4. **Disk space**: `df -h` — which filesystems exist and what's their usage?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           588M  2.1M  586M   1% /run
+/dev/sda2        98G   17G   77G  18% /
+tmpfs           2.9G   82M  2.8G   3% /dev/shm
+tmpfs           5.0M  8.0K  5.0M   1% /run/lock
+tmpfs           588M  132K  588M   1% /run/user/1000
+/dev/sr0         94M   94M     0 100% /media/sam/CDROM
+/dev/sr1        6.0G  6.0G     0 100% /media/sam/Ubuntu 24.04.3 LTS amd64
+
+Usuage is highLighted in 5th column Use% and filesystems are highLighted in first column.
+
+5. **Disk inodes**: `df -i` — are any at risk?
+Filesystem      Inodes  IUsed   IFree IUse% Mounted on
+tmpfs           752367   1266  751101    1% /run
+/dev/sda2      6553600 233341 6320259    4% /
+tmpfs           752367    165  752202    1% /dev/shm
+tmpfs           752367      4  752363    1% /run/lock
+tmpfs           150473    173  150300    1% /run/user/1000
+/dev/sr0             0      0       0     - /media/sam/CDROM
+/dev/sr1             0      0       0     - /media/sam/Ubuntu 24.04.3 LTS amd64
+
+No Inodes is at risk as all are under 80% only.
+
+6. **Biggest directories**: `du -sh /* 2>/dev/null | sort -rh | head -10`
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ du -sh /* 2>/dev/null | sort -rh | head -10
+7.8G    /snap
+6.0G    /media
+4.5G    /usr
+4.2G    /var
+4.1G    /swap.img
+1.9G    /home
+379M    /opt
+203M    /boot
+12M     /etc
+2.2M    /run
+
+7. **I/O stats**: `vmstat 2 3` — is there any swap I/O (si/so)?
+procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu
+ 1  0      0 471896 189024 3189472    0    0   205    18  574    2  1  1 98  0  0  0
+ 0  0      0 473240 189024 3189348    0    0     0     0  667 2292  2  1 96  0  0  0
+ 0  0      0 469408 189032 3189472    0    0     0    32  366  532  1  0 99  0  0  0
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+No, IO Swap.
+
+==============================================================
+Part 2: Log Investigation**
+==============================================================
+
+8. **Boot messages**: `journalctl -b -p warning --no-pager | tail -30`
+   — Any warnings or errors since last boot?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ journalctl -b -p warning --no-pager | tail -30
+Feb 28 13:15:26 sam-VMware-Virtual-Platform gnome-shell[1806]: Connection to xwayland lost
+Feb 28 13:15:26 sam-VMware-Virtual-Platform gnome-shell[1806]: Xwayland terminated, exiting since it was mandatory
+Feb 28 13:15:26 sam-VMware-Virtual-Platform gnome-shell[1806]: JS ERROR: Gio.IOErrorEnum: Xwayland exited unexpectedly
+                                                               @resource:///org/gnome/shell/ui/init.js:21:20
+Feb 28 13:15:26 sam-VMware-Virtual-Platform gdm3[1686]: Gdm: on_display_removed: assertion 'GDM_IS_REMOTE_DISPLAY (display)' failed
+Feb 28 13:15:26 sam-VMware-Virtual-Platform vmtoolsd[2738]: gtk_disable_setlocale() must be called before gtk_init()
+Feb 28 13:15:36 sam-VMware-Virtual-Platform gnome-keyring-daemon[2353]: asked to register item /org/freedesktop/secrets/collection/login/2, but it's already registered
+Feb 28 13:15:36 sam-VMware-Virtual-Platform gnome-keyring-d[2353]: asked to register item /org/freedesktop/secrets/collection/login/2, but it's already registered
+Feb 28 13:15:36 sam-VMware-Virtual-Platform systemd[1714]: xdg-document-portal.service: Failed with result 'exit-code'.
+Feb 28 13:59:31 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 13:59:31 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 14:10:23 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 14:10:23 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+Feb 28 14:10:23 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 14:10:23 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+Feb 28 14:40:15 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 14:40:15 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 15:00:24 sam-VMware-Virtual-Platform kernel: kauditd_printk_skb: 97 callbacks suppressed
+Feb 28 15:16:26 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 15:16:26 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 15:18:46 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 15:18:46 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+Feb 28 15:18:46 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 15:18:46 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+Feb 28 15:35:36 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 15:35:36 sam-VMware-Virtual-Platform update-notifier[3827]: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+Feb 28 15:53:43 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 15:53:43 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+Feb 28 15:53:43 sam-VMware-Virtual-Platform gnome-shell[2571]: GFileInfo created without standard::icon
+Feb 28 15:53:43 sam-VMware-Virtual-Platform gnome-shell[2571]: file ../../../gio/gfileinfo.c: line 1765 (g_file_info_get_icon): should not be reached
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$
+Observations:
+There is a service gtk_widget_get_scale_factor that has failed multiple time.
+xwayland was also unexpectedly closed.
+
+
+9. **Recent system errors**: `journalctl -p err --since "today" --no-pager | tail -20`
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ journalctl -p err --since "today" --no-pager | tail -20
+Feb 28 13:13:51 sam-VMware-Virtual-Platform kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Feb 28 13:13:51 sam-VMware-Virtual-Platform kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Feb 28 13:13:51 sam-VMware-Virtual-Platform kernel: [Firmware Bug]: cpu 2, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Feb 28 13:13:51 sam-VMware-Virtual-Platform kernel: [Firmware Bug]: cpu 3, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Feb 28 13:13:54 sam-VMware-Virtual-Platform kernel: piix4_smbus 0000:00:07.3: SMBus Host Controller not enabled!
+Feb 28 13:15:21 sam-VMware-Virtual-Platform gdm-password][2312]: gkr-pam: unable to locate daemon control file
+Feb 28 13:15:22 sam-VMware-Virtual-Platform gdm3[1686]: Gdm: on_display_added: assertion 'GDM_IS_REMOTE_DISPLAY (display)' failed
+Feb 28 13:15:22 sam-VMware-Virtual-Platform systemd[2324]: Failed to start app-gnome-gnome\x2dkeyring\x2dpkcs11-2552.scope - Application launched by gnome-session-binary.
+Feb 28 13:15:24 sam-VMware-Virtual-Platform kernel: /dev/sr0: Can't open blockdev
+Feb 28 13:15:24 sam-VMware-Virtual-Platform kernel: /dev/sr1: Can't open blockdev
+Feb 28 13:15:26 sam-VMware-Virtual-Platform gdm3[1686]: Gdm: on_display_removed: assertion 'GDM_IS_REMOTE_DISPLAY (display)' failed
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+
+10. **Auth log check**: `grep -E "Accepted|Failed" /var/log/auth.log | tail -20`
+    — Any login attempts you recognise? Any failed ones?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ grep -E "Accepted|Failed" /var/log/auth.log | tail -20
+2026-02-22T09:59:26.588989+05:30 sam-VMware-Virtual-Platform dbus-daemon[912]: [system] Failed to activate service 'org.bluez': timed out (service_start_timeout=25000ms)
+2026-02-22T10:00:47.872864+05:30 sam-VMware-Virtual-Platform dbus-daemon[912]: [system] Failed to activate service 'org.bluez': timed out (service_start_timeout=25000ms)
+2026-02-28T13:15:55.721586+05:30 sam-VMware-Virtual-Platform dbus-daemon[965]: [system] Failed to activate service 'org.bluez': timed out (service_start_timeout=25000ms)
+2026-02-28T13:30:49.298006+05:30 sam-VMware-Virtual-Platform dbus-daemon[965]: [system] Failed to activate service 'org.bluez': timed out (service_start_timeout=25000ms)
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+No i dont see any failed ones.
+
+11. **Kernel messages**: `dmesg -T | tail -30`
+    — Any hardware or kernel warnings?
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo dmesg -l err,warn
+[    0.000000] [Firmware Bug]: TSC doesn't count with P0 frequency!
+[    0.541961] unchecked MSR access error: RDMSR from 0x852 at rIP: 0xffffffff9e346ec7 (native_read_msr+0x7/0x50)
+[    0.541968] Call Trace:
+[    0.541969]  <TASK>
+[    0.541971]  native_apic_msr_read+0x1b/0x60
+[    0.541974]  setup_APIC_eilvt+0x46/0x200
+[    0.541977]  ? native_read_msr_safe+0x10/0x70
+[    0.541978]  mce_amd_feature_init+0x2c5/0x370
+[    0.541981]  __mcheck_cpu_init_vendor+0x4e/0xd0
+[    0.541983]  mcheck_cpu_init+0x179/0x2d0
+[    0.541986]  identify_cpu+0x3d7/0x6a0
+[    0.541988]  identify_boot_cpu+0x10/0xd0
+[    0.541991]  arch_cpu_finalize_init+0x19/0x100
+[    0.541993]  start_kernel+0x37e/0x510
+[    0.541996]  x86_64_start_reservations+0x18/0x30
+[    0.541998]  x86_64_start_kernel+0xfd/0x150
+[    0.542000]  ? soft_restart_cpu+0x14/0x14
+[    0.542002]  common_startup_64+0x13e/0x141
+[    0.542004]  </TASK>
+[    0.542006] [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+[    0.542038] Speculative Return Stack Overflow: IBPB-extending microcode not applied!
+[    0.542039] Speculative Return Stack Overflow: WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options.
+[    0.017401] [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+[    0.017401] [Firmware Bug]: cpu 2, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+[    0.017401] [Firmware Bug]: cpu 3, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+[    1.893384] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+[    1.894007] amd_pstate: The CPPC feature is supported but currently disabled by the BIOS.
+               Please enable it if your BIOS has the CPPC option.
+[    1.894009] amd_pstate: the _CPC object is not present in SBIOS or ACPI disabled
+[    2.924116] sd 2:0:0:0: [sda] Assuming drive cache: write through
+[    5.651112] kauditd_printk_skb: 45 callbacks suppressed
+[    7.572877] piix4_smbus 0000:00:07.3: SMBus Host Controller not enabled!
+[   12.261722] ------------[ cut here ]------------
+[   12.261726] WARNING: CPU: 1 PID: 754 at drivers/gpu/drm/vmwgfx/vmwgfx_bo.c:77 vmw_bo_free+0x41/0x60 [vmwgfx]
+[   12.261745] Modules linked in: snd_seq_dummy snd_hrtimer snd_ens1371 snd_ac97_codec gameport ac97_bus intel_rapl_msr intel_rapl_common snd_pcm snd_seq_midi polyval_clmulni snd_seq_midi_event snd_rawmidi ghash_clmulni_intel vmw_balloon aesni_intel snd_seq snd_seq_device snd_timer snd i2c_piix4 soundcore i2c_smbus qrtr vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci binfmt_misc joydev input_leds mac_hid serio_raw sch_fq_codel vmwgfx drm_ttm_helper ttm msr parport_pc ppdev lp parport efi_pstore nfnetlink dmi_sysfs ip_tables x_tables autofs4 hid_generic usbhid hid mptspi psmouse vga16fb mptscsih vgastate ahci libahci mptbase e1000 pata_acpi scsi_transport_spi floppy
+[   12.261837] CPU: 1 UID: 0 PID: 754 Comm: plymouthd Not tainted 6.17.0-14-generic #14~24.04.1-Ubuntu PREEMPT(voluntary) 
+[   12.261841] Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 03/24/2025
+[   12.261843] RIP: 0010:vmw_bo_free+0x41/0x60 [vmwgfx]
+[   12.261853] Code: 75 28 48 89 df e8 ef fd ff ff 48 83 bb 88 02 00 00 00 75 1a 48 89 df e8 1d 24 08 de 48 8b 5d f8 c9 31 c0 31 ff e9 3a 40 a3 dd <0f> 0b eb d4 0f 0b 48 89 df e8 01 24 08 de 48 8b 5d f8 c9 31 c0 31
+[   12.261855] RSP: 0018:ffffd24542b8fab8 EFLAGS: 00010286
+[   12.261858] RAX: ffff8e30098474c0 RBX: ffff8e3001dcd000 RCX: 0000000000000000
+[   12.261860] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8e3001dcd000
+[   12.261862] RBP: ffffd24542b8fac0 R08: 0000000000000000 R09: 0000000000000000
+[   12.261863] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+[   12.261865] R13: ffff8e3005420628 R14: ffff8e3001dcd000 R15: ffff8e3001dcd100
+[   12.261867] FS:  0000000000000000(0000) GS:ffff8e3114ee3000(0000) knlGS:0000000000000000
+[   12.261869] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   12.261871] CR2: 000061203a273500 CR3: 000000012ba40000 CR4: 0000000000350ef0
+[   12.261873] Call Trace:
+[   12.261876]  <TASK>
+[   12.261879]  ttm_bo_release+0x70/0x2d0 [ttm]
+[   12.261886]  ? drm_vma_node_revoke+0x73/0x90
+[   12.261891]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   12.261895]  ? kfree+0x2c5/0x360
+[   12.261901]  ttm_bo_put+0x3c/0x70 [ttm]
+[   12.261906]  vmw_gem_object_free+0x13/0x30 [vmwgfx]
+[   12.261916]  drm_gem_object_handle_put_unlocked+0x12c/0x140
+[   12.261922]  drm_gem_object_release_handle+0x5b/0xc0
+[   12.261925]  ? __pfx_drm_gem_object_release_handle+0x10/0x10
+[   12.261928]  idr_for_each+0x70/0xf0
+[   12.261933]  drm_gem_release+0x20/0x40
+[   12.261937]  drm_file_free+0x1e9/0x290
+[   12.261940]  drm_release+0xb3/0x140
+[   12.261943]  __fput+0xed/0x2d0
+[   12.261947]  ____fput+0x15/0x20
+[   12.261950]  task_work_run+0x60/0xa0
+[   12.261954]  do_exit+0x1fa/0x480
+[   12.261959]  do_group_exit+0x34/0x90
+[   12.261963]  get_signal+0x832/0x840
+[   12.261968]  arch_do_signal_or_restart+0x41/0x200
+[   12.261975]  exit_to_user_mode_loop+0x91/0x170
+[   12.261979]  do_syscall_64+0x198/0xa30
+[   12.261982]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   12.261985]  ? switch_fpu_return+0x5c/0x100
+[   12.261989]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   12.261991]  ? arch_exit_to_user_mode_prepare.isra.0+0xc2/0xe0
+[   12.261995]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   12.261998]  ? do_syscall_64+0xb6/0xa30
+[   12.262000]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   12.262003]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   12.262005] RIP: 0033:0x7c419bc1b28d
+[   12.262008] Code: Unable to access opcode bytes at 0x7c419bc1b263.
+[   12.262009] RSP: 002b:00007c419a890dc8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+[   12.262012] RAX: fffffffffffffe00 RBX: 00005f97342c7e60 RCX: 00007c419bc1b28d
+[   12.262014] RDX: 0000000000000007 RSI: 0000000000000080 RDI: 00005f97342c7e70
+[   12.262015] RBP: 00007c419a890e00 R08: 0000000000000007 R09: 00005f97342d2a20
+[   12.262017] R10: 0000000000000000 R11: 0000000000000246 R12: 00007c419a891648
+[   12.262018] R13: 0000000000000007 R14: 00005f97342c7e70 R15: 0000000000000002
+[   12.262024]  </TASK>
+[   12.262026] ---[ end trace 0000000000000000 ]---
+[  101.145392] /dev/sr0: Can't open blockdev
+[  101.145493] /dev/sr1: Can't open blockdev
+[ 6401.401950] kauditd_printk_skb: 97 callbacks suppressed
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+
+12. **Service health check**: Check status of 3 services: `ssh`, `systemd-logind`, and one more of your choice
+    ```bash
+    systemctl status ssh --no-pager
+    systemctl status systemd-logind --no-pager
+    ```
+
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ systemctl status apport
+● apport.service - automatic crash report generation
+     Loaded: loaded (/usr/lib/systemd/system/apport.service; enabled; preset: enabled)
+     Active: active (exited) since Sat 2026-02-28 13:13:53 IST; 3h 2min ago
+   Main PID: 957 (code=exited, status=0/SUCCESS)
+        CPU: 329ms
+
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd[1]: Starting apport.service - automatic crash report generation...
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd[1]: Finished apport.service - automatic crash report generation.
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ systemctl status systemd-logind --no-pager
+● systemd-logind.service - User Login Management
+     Loaded: loaded (/usr/lib/systemd/system/systemd-logind.service; static)
+    Drop-In: /usr/lib/systemd/system/systemd-logind.service.d
+             └─dbus.conf
+     Active: active (running) since Sat 2026-02-28 13:13:53 IST; 3h 2min ago
+       Docs: man:sd-login(3)
+             man:systemd-logind.service(8)
+             man:logind.conf(5)
+             man:org.freedesktop.login1(5)
+   Main PID: 1075 (systemd-logind)
+     Status: "Processing requests..."
+      Tasks: 1 (limit: 6956)
+   FD Store: 7 (limit: 512)
+     Memory: 2.1M (peak: 2.8M)
+        CPU: 210ms
+     CGroup: /system.slice/systemd-logind.service
+             └─1075 /usr/lib/systemd/systemd-logind
+
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd[1]: Starting systemd-logind.service - User Login Management...
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd-logind[1075]: New seat seat0.
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd-logind[1075]: Watching system buttons on /dev/input/event0 (Power Button)
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd-logind[1075]: Watching system buttons on /dev/input/event1 (AT Translated Set 2 keyboard)
+Feb 28 13:13:53 sam-VMware-Virtual-Platform systemd[1]: Started systemd-logind.service - User Login Management.
+Feb 28 13:13:55 sam-VMware-Virtual-Platform systemd-logind[1075]: New session c1 of user gdm.
+Feb 28 13:15:21 sam-VMware-Virtual-Platform systemd-logind[1075]: New session 3 of user sam.
+Feb 28 13:15:26 sam-VMware-Virtual-Platform systemd-logind[1075]: Session c1 logged out. Waiting for processes to exit.
+Feb 28 13:15:26 sam-VMware-Virtual-Platform systemd-logind[1075]: Removed session c1.
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ systemctl status NetworkManager --no-pager
+● NetworkManager.service - Network Manager
+     Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; preset: enabled)
+     Active: active (running) since Sat 2026-02-28 13:13:54 IST; 3h 2min ago
+       Docs: man:NetworkManager(8)
+   Main PID: 1165 (NetworkManager)
+      Tasks: 4 (limit: 6956)
+     Memory: 18.3M (peak: 34.6M)
+        CPU: 1.029s
+     CGroup: /system.slice/NetworkManager.service
+             └─1165 /usr/sbin/NetworkManager --no-daemon
+
+Feb 28 14:28:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772269131.4497] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 14:43:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772270031.4468] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 14:58:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772270931.4483] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 15:13:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772271831.4479] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 15:18:46 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772272126.0036] agent-manager: agent[8d1f06ddc0ca463c,:1.75/org.gnome.Shell.NetworkAgent/1000]: a…t registered
+Feb 28 15:28:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772272731.4492] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 15:43:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772273631.4607] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 15:53:43 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772274223.0461] agent-manager: agent[3784be0a882e40fe,:1.75/org.gnome.Shell.NetworkAgent/1000]: a…t registered
+Feb 28 15:58:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772274531.4490] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Feb 28 16:13:51 sam-VMware-Virtual-Platform NetworkManager[1165]: <info>  [1772275431.4491] dhcp4 (ens33): state changed new lease, address=192.168.150.128
+Hint: Some lines were ellipsized, use -l to show in full.
+
+==============================================================
+Part 3: Disk Housekeeping**
+==============================================================
+
+13. **Journal size**: `journalctl --disk-usage`
+Ans:
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ journalctl --disk-usage
+Archived and active journals take up 240.3M in the file system.
+
+14. **Package cache**: `du -sh /var/cache/apt/archives/`
+Ans:
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ sudo du -sh /var/cache/apt/archives/
+2.4M    /var/cache/apt/archives/
+
+
+15. **Log file sizes**: `ls -lhS /var/log/*.log 2>/dev/null | head -10`
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ ls -lhS /var/log/*.log 2>/dev/null | head -10
+-rw-r----- 1 syslog adm  215K Feb 28 16:04 /var/log/kern.log
+-rw-r--r-- 1 root   root 121K Feb  7 13:03 /var/log/dpkg.log
+-rw-r--r-- 1 root   root 116K Aug  5  2025 /var/log/bootstrap.log
+-rw-r----- 1 syslog adm   70K Jan  4 12:57 /var/log/cloud-init.log
+-rw-r----- 1 syslog adm   35K Feb 28 16:18 /var/log/auth.log
+-rw------- 1 root   sam   25K Feb 28 13:15 /var/log/vmware-vmusr-sam.log
+-rw------- 1 root   root 8.6K Feb 28 13:13 /var/log/vmware-vmtoolsd-root.log
+-rw------- 1 root   sam  8.5K Feb 28 13:15 /var/log/vmware-vmtoolsd-sam.log
+-rw-r--r-- 1 root   root 5.5K Feb  7 12:54 /var/log/alternatives.log
+-rw-r--r-- 1 root   root 4.6K Aug  5  2025 /var/log/fontconfig.log
+sam@sam-VMware-Virtual-Platform:~/DevopsRoadmap$ 
+
+==============================================================
+**Security Questions:**
+==============================================================
+
+1. What does a load average of `8.00` mean on a 4-core system?
+Ans: That 8 process are waiting for 4 cores that is 200% utilisation and its bad.
+
+2. What's the difference between `free` memory and `available` memory?
+Ans: Free memory is the actual curently available memory that the OS and processes are not using, but on the other hand available memory is the amount of memory that can be utilised and can be used if required by freeing up kernel cache.
+3. Why should you use `tail -F` instead of `tail -f` in production?
+Ans: If the file is rotated (deleted and recreated), -f stops getting updates
+where on the other hand -F: follows by filename, handles rotation automatically, thats why we should use tail -F in production. to not loose any logs if its rotated.
+
+4. What does it mean when `vmstat` shows `si/so > 0`?
+Ans: Ram in under pressure, either kill some processes or increase the ram.
+
+5. What is the OOM killer and when does it activate?
+Ans: OOM killer kill the process when the system is out of memory that is its utilisation reaches 100%, this is done to ensure that all processes dosen't crash.

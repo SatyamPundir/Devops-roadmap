@@ -862,3 +862,103 @@ Run these and save output:
 ---
 
 Create `/home/sam/DevopsRoadmap/Phase-1-Linux/monitoring-report.txt` with all commands AND their outputs. Show your thinking where asked!
+
+---
+
+## 📓 Learning Log
+
+**Date:** February 28, 2026
+**Module:** 08 - Monitoring & Logs
+**Grade:** 89/100
+
+### Mistakes & Corrections
+
+**Mistake 1 — Task 8: Misidentified a GTK function as a "service"**
+
+Saw repeated `gtk_widget_get_scale_factor` in logs and said "a service has failed."
+
+- `gtk_widget_get_scale_factor` is a **GTK library function**, not a service
+- The actual process failing was `update-notifier` throwing assertion errors inside GTK
+- These are GUI-layer glitches, harmless on a VMware desktop
+- To find failing SERVICES, look for: `Failed to start`, `systemd[1]:`, `.service` in the message
+
+---
+
+**Mistake 2 — Task 11: Ran output but provided zero interpretation**
+
+Used a good command (`dmesg -l err,warn`) but didn't explain what the kernel messages meant.
+
+Key messages in the output and what they mean:
+
+```
+[Firmware Bug]: TSC doesn't count with P0 frequency
+→ Harmless VMware timer quirk. Very common in VMs.
+
+Speculative Return Stack Overflow: IBPB microcode not applied
+→ Real CPU security vulnerability (SRSO). Low risk on local VM,
+  but on production servers, mitigations should be applied.
+
+WARNING: vmw_bo_free [vmwgfx] — stack trace
+→ VMware graphics driver bug during boot. Non-fatal since display works.
+
+piix4_smbus: SMBus Host Controller not enabled
+→ Virtual hardware quirk, ignore.
+```
+
+**Rule:** A kernel `WARNING:` with a stack trace is not just noise. Always explain WHY it's safe to ignore, or escalate if you can't.
+
+---
+
+**Mistake 3 — Task 10: Incomplete auth.log interpretation**
+
+Found only Bluetooth failures in auth.log and said "no failed ones." Should have said:
+- The `org.bluez` entries ARE failures (Bluetooth service timing out)
+- No SSH authentication failures = expected on a local-only VM
+- Zero `Accepted` entries = no successful SSH logins = also expected
+
+---
+
+**Correction: OOM killer trigger condition**
+
+Said "OOM killer activates at 100% RAM utilization."
+
+Correct: OOM killer activates when:
+1. RAM is full
+2. Swap is also exhausted (or no swap exists)
+3. Kernel attempts memory allocation and fails
+4. **Only then** does it choose and kill a process
+
+It's a last resort, not a percentage threshold.
+
+---
+
+### Commands to Remember
+
+```bash
+# Identify what process is failing (not the function name)
+journalctl -b -p warning --no-pager | awk '{print $5}' | sort | uniq -c | sort -rn
+
+# Check kernel errors with timestamps and follow
+dmesg -Tw -l err,warn
+
+# Check if OOM killer has fired
+journalctl -k | grep -i "oom\|killed process"
+dmesg -T | grep -i "Out of memory\|killed process"
+
+# Auth log: SSH-specific logins only (not all "Failed")
+grep -E "sshd.*Accepted|sshd.*Failed" /var/log/auth.log | tail -20
+
+# Quick system health one-liner
+echo "=Load=" && uptime && echo "=Mem=" && free -h | grep Mem && echo "=Disk=" && df -h / && echo "=Swap=" && free -h | grep Swap
+```
+
+### Production Takeaway
+
+In monitoring, there are two skills:
+1. **Running the right command** — you did this well
+2. **Reading and interpreting the output** — this is where the real value is
+
+A junior engineer runs `dmesg` and scrolls past a kernel WARNING.
+A senior engineer runs `dmesg` and can explain whether each warning is harmless, needs a ticket, or needs a page at 3 AM.
+
+Build the habit: every log line you see, ask "what process? what does this mean? is it harmless?"
